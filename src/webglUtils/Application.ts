@@ -178,7 +178,7 @@ export class Application implements EventListenerObject {
   }
 
   // 启动动画循环
-  public start(): void {
+  private start(): void {
     if (this._start === false) {
       this._start = true;
       //this . _requestId = -1 ; // 将_requestId设置为-1

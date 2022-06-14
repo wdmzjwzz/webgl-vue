@@ -23,6 +23,7 @@ export default class Sence extends Vue {
 
   mounted(): void {
     this.canvas = this.$refs.canvas as HTMLCanvasElement;
+    this.resizeCanvasToDisplaySize(this.canvas);
     const camera = new Camera(
       this.canvas.width,
       this.canvas.height,
@@ -30,14 +31,12 @@ export default class Sence extends Vue {
       0.1,
       1000
     );
-    camera.z = 10;
+    camera.z = 500;
     const app = new CameraApplication(this.canvas, camera);
-    app.start();
-    this.resizeCanvasToDisplaySize();
+    app.run();
   }
 
-  resizeCanvasToDisplaySize(): boolean {
-    const canvas = this.$refs.canvas as HTMLCanvasElement;
+  resizeCanvasToDisplaySize(canvas: HTMLCanvasElement): boolean {
     const displayWidth = canvas.clientWidth;
     const displayHeight = canvas.clientHeight;
 

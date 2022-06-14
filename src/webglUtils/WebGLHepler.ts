@@ -49,7 +49,7 @@ export class GLHelper {
     );
     console.log(
       "6. isSampleAlphtToCoverageEnable = " +
-        gl.isEnabled(gl.SAMPLE_ALPHA_TO_COVERAGE)
+      gl.isEnabled(gl.SAMPLE_ALPHA_TO_COVERAGE)
     );
     console.log(
       "7. isSampleCoverageEnable = " + gl.isEnabled(gl.SAMPLE_COVERAGE)
@@ -103,11 +103,14 @@ export class GLHelper {
 
   public static setDefaultState(gl: WebGL2RenderingContext): void {
     // default [r=0,g=0,b=0,a=0]
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.clearColor(0.0, 0.0, 0.0, 0.0); // 每次清屏时，将颜色缓冲区设置为全透明黑色
-    gl.clearDepth(1.0); // 每次清屏时，将深度缓冲区设置为1.0
-    gl.enable(gl.DEPTH_TEST); //开启深度测试
-    gl.enable(gl.CULL_FACE); //开启背面剔除
-    gl.enable(gl.SCISSOR_TEST); // 开启裁剪测试
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    // turn on depth testing
+    gl.enable(gl.DEPTH_TEST);
+    // tell webgl to cull faces
+    gl.enable(gl.CULL_FACE);
+
   }
 
   public static compileShader(
