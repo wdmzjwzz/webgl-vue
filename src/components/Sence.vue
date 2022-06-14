@@ -8,8 +8,6 @@
 import { Options, Vue } from "vue-class-component";
 import { GLProgram } from "@/webglUtils/GLProgram";
 import { CameraApplication } from "@/webglUtils/CameraApplication";
-import vertexShader from "@/shaders/vertexShader.vert";
-import fragmentShader from "@/shaders/fragmentShader.frag";
 import { Camera } from "@/webglUtils/Camera";
 @Options({
   props: {
@@ -22,10 +20,8 @@ export default class Sence extends Vue {
   gl: WebGL2RenderingContext | null = null;
   canvas: HTMLCanvasElement | null = null;
   app: CameraApplication | null = null;
-  data() {
-    return {};
-  }
-  mounted() {
+
+  mounted(): void {
     this.canvas = this.$refs.canvas as HTMLCanvasElement;
     const camera = new Camera(
       this.canvas.width,
@@ -40,7 +36,7 @@ export default class Sence extends Vue {
     this.resizeCanvasToDisplaySize();
   }
 
-  resizeCanvasToDisplaySize() {
+  resizeCanvasToDisplaySize(): boolean {
     const canvas = this.$refs.canvas as HTMLCanvasElement;
     const displayWidth = canvas.clientWidth;
     const displayHeight = canvas.clientHeight;
