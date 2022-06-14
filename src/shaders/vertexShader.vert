@@ -17,5 +17,5 @@ void main() {
   gl_Position = u_worldViewProjection * a_position;
 
   // orient the normals and pass to the fragment shader
-  v_normal = mat3(u_worldInverseTranspose) * a_normal;
+  v_normal = (u_worldInverseTranspose * vec4(a_normal, 0)).xyz;
 }

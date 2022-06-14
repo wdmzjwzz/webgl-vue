@@ -2,8 +2,11 @@
 import { Application, CanvasKeyBoardEvent } from "./Application";
 import { Camera } from "./Camera";
 import { GLProgram } from "./GLProgram";
-import vertexShader from "@/shaders/vertexShader.vert";
-import fragmentShader from "@/shaders/fragmentShader.frag";
+// import vertexShader from "@/shaders/vertexShader.vert";
+// import fragmentShader from "@/shaders/fragmentShader.frag";
+
+import vertexShader from "@/shaders/vertexShader_pointLight.vert";
+import fragmentShader from "@/shaders/fragmentShader_pointLight.frag";
 import { Matrix4, Vector3, Vector4 } from "./math/TSM";
 import { GLHelper } from "./WebGLHepler";
 export class CameraApplication extends Application {
@@ -37,13 +40,23 @@ export class CameraApplication extends Application {
     const normalAttributeLocation = gl.getAttribLocation(program, "a_normal");
     // lookup uniforms
     // look up uniform locations
-    this.uniformLocations.worldViewProjectionLocation = gl.getUniformLocation(program, "u_worldViewProjection");
+
+    this.uniformLocations.worldViewProjectionLocation =
+      gl.getUniformLocation(program, "u_worldViewProjection");
     this.uniformLocations.worldInverseTransposeLocation =
       gl.getUniformLocation(program, "u_worldInverseTranspose");
     this.uniformLocations.colorLocation = gl.getUniformLocation(program, "u_color");
-    this.uniformLocations.reverseLightDirectionLocation =
-      gl.getUniformLocation(program, "u_reverseLightDirection");
-
+    this.uniformLocations.shininessLocation = gl.getUniformLocation(program, "u_shininess");
+    this.uniformLocations.lightWorldPositionLocation =
+      gl.getUniformLocation(program, "u_lightWorldPosition");
+    this.uniformLocations.viewWorldPositionLocation =
+      gl.getUniformLocation(program, "u_viewWorldPosition");
+    this.uniformLocations.worldLocation =
+      gl.getUniformLocation(program, "u_world");
+    this.uniformLocations.lightColorLocation =
+      gl.getUniformLocation(program, "u_lightColor");
+    this.uniformLocations.specularColorLocation =
+      gl.getUniformLocation(program, "u_specularColor");
 
     // Create a buffer and put a 2 points in it for 1 line
     const positionBuffer = gl.createBuffer();
@@ -104,8 +117,12 @@ export class CameraApplication extends Application {
 
     const worldInverseMatrix = worldMatrix.copy().inverse()
     const worldInverseTransposeMatrix = worldInverseMatrix.copy().transpose();
-   
+
+
     // Set the matrices
+    this.gl.uniformMatrix4fv(
+      this.uniformLocations.worldLocation, false,
+      worldMatrix.values);
     this.gl.uniformMatrix4fv(
       this.uniformLocations.worldViewProjectionLocation, false,
       worldViewProjectionMatrix.values);
@@ -116,12 +133,27 @@ export class CameraApplication extends Application {
     // Set the color to use
     this.gl.uniform4fv(this.uniformLocations.colorLocation, [0.2, 1, 0.2, 1]); // green
 
-    const mat = new Vector3([0.5, 0.7, 1]).normalize()
-  
+    // set the light position
+    this.gl.uniform3fv(this.uniformLocations.lightWorldPositionLocation, [200, 300, 400]);
+
+    // set the camera/view position
+    this.gl.uniform3fv(this.uniformLocations.viewWorldPositionLocation, this.camera.position.values);
+
+    // set the shininess
+    this.gl.uniform1f(this.uniformLocations.shininessLocation, 50);
+
+    // set the light color
+    this.gl.uniform3fv(this.uniformLocations.lightColorLocation, new Vector3([1, 0.6, 0.6]).normalize().values);  // red light
+
+    // set the specular color
+    this.gl.uniform3fv(this.uniformLocations.specularColorLocation, new Vector3([1, 0.2, 0.2]).normalize().values);  // red light
+
+    const mat = new Vector3([0, 0, 1]).normalize()
+
     // set the light direction.
-    this.gl.uniform3fv(this.uniformLocations.reverseLightDirectionLocation, mat.values);
+    // this.gl.uniform3fv(this.uniformLocations.reverseLightDirectionLocation, mat.values);
 
-
+    this.gl.uniform3fv(this.uniformLocations.lightWorldPositionLocation, [100, 120, 100]);
     // Draw the geometry.
     const primitiveType = this.gl.TRIANGLES;
     const offset = 0;
