@@ -7,7 +7,7 @@ export interface GLSetters {
 export class GLProgram {
   public gl: WebGL2RenderingContext; // WebGL上下文渲染对象
 
-  public program: WebGLProgram | null; // 链接器
+  public program: WebGLProgram; // 链接器
   public vsShader: WebGLShader | null; // vertex shader编译器
   public fsShader: WebGLShader | null; // fragment shader编译器
 
@@ -25,8 +25,11 @@ export class GLProgram {
 
     this.fsShader = this.gl.createShader(this.gl.FRAGMENT_SHADER);
 
-    this.program = this.gl.createProgram();
-
+    const program = this.gl.createProgram();
+    if (!program) {
+      throw new Error("program failed");
+    }
+    this.program = program;
     this.loadShaders(vsShader, fsShader);
   }
   public loadShaders(vs: string, fs: string): void {

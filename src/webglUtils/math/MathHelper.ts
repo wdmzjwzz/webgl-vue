@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { EPSILON, Vector2, Vector3, Vector4, Matrix4, quat } from "./TSM";
 
 export enum EAxisType {

@@ -7,8 +7,10 @@
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
 import { GLProgram } from "@/webglUtils/GLProgram";
+import { CameraApplication } from "@/webglUtils/CameraApplication";
 import vertexShader from "@/shaders/vertexShader.vert";
 import fragmentShader from "@/shaders/fragmentShader.frag";
+import { Camera } from "@/webglUtils/Camera";
 @Options({
   props: {
     msg: String,
@@ -19,14 +21,23 @@ export default class Sence extends Vue {
   program: GLProgram | null = null;
   gl: WebGL2RenderingContext | null = null;
   canvas: HTMLCanvasElement | null = null;
+  app: CameraApplication | null = null;
   data() {
     return {};
   }
   mounted() {
     this.canvas = this.$refs.canvas as HTMLCanvasElement;
-    this.gl = this.canvas.getContext("webgl2");
+    const camera = new Camera(
+      this.canvas.width,
+      this.canvas.height,
+      45,
+      0.1,
+      1000
+    );
+    camera.z = 10;
+    const app = new CameraApplication(this.canvas, camera);
+    app.start();
     this.resizeCanvasToDisplaySize();
-    this.program = new GLProgram(this.gl!, vertexShader, fragmentShader);
   }
 
   resizeCanvasToDisplaySize() {

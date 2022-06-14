@@ -1,5 +1,5 @@
-export let EPSILON: number = 0.0001;
-
+/* eslint-disable */
+export const EPSILON: number = 0.0001; 
 export class Vector2 {
   public values = new Float32Array(2);
 
@@ -539,7 +539,7 @@ export class Matrix4 {
   }
 
   public transpose(): Matrix4 {
-    let temp01 = this.values[1],
+    const temp01 = this.values[1],
       temp02 = this.values[2],
       temp03 = this.values[3],
       temp12 = this.values[6],
@@ -564,7 +564,7 @@ export class Matrix4 {
   }
 
   public determinant(): number {
-    let a00 = this.values[0],
+    const a00 = this.values[0],
       a01 = this.values[1],
       a02 = this.values[2],
       a03 = this.values[3],
@@ -581,7 +581,7 @@ export class Matrix4 {
       a32 = this.values[14],
       a33 = this.values[15];
 
-    let det00 = a00 * a11 - a01 * a10,
+    const det00 = a00 * a11 - a01 * a10,
       det01 = a00 * a12 - a02 * a10,
       det02 = a00 * a13 - a03 * a10,
       det03 = a01 * a12 - a02 * a11,
@@ -604,9 +604,9 @@ export class Matrix4 {
     );
   }
 
-  public inverse(out: Matrix4): boolean {
-    this.copy(out);
-    let a00 = out.values[0],
+  public inverse(): Matrix4 {
+    const out = this.copy();
+    const a00 = out.values[0],
       a01 = out.values[1],
       a02 = out.values[2],
       a03 = out.values[3],
@@ -623,7 +623,7 @@ export class Matrix4 {
       a32 = out.values[14],
       a33 = out.values[15];
 
-    let det00 = a00 * a11 - a01 * a10,
+    const det00 = a00 * a11 - a01 * a10,
       det01 = a00 * a12 - a02 * a10,
       det02 = a00 * a13 - a03 * a10,
       det03 = a01 * a12 - a02 * a11,
@@ -644,8 +644,6 @@ export class Matrix4 {
       det04 * det07 +
       det05 * det06;
 
-    if (!det) return false;
-
     det = 1.0 / det;
 
     out.values[0] = (a11 * det11 - a12 * det10 + a13 * det09) * det;
@@ -665,23 +663,23 @@ export class Matrix4 {
     out.values[14] = (-a30 * det03 + a31 * det01 - a32 * det00) * det;
     out.values[15] = (a20 * det03 - a21 * det01 + a22 * det00) * det;
 
-    return true;
+    return out;
   }
 
   public multiply(matrix: Matrix4): Matrix4 {
-    let a00 = this.values[0],
+    const a00 = this.values[0],
       a01 = this.values[1],
       a02 = this.values[2],
       a03 = this.values[3];
-    let a10 = this.values[4],
+    const a10 = this.values[4],
       a11 = this.values[5],
       a12 = this.values[6],
       a13 = this.values[7];
-    let a20 = this.values[8],
+    const a20 = this.values[8],
       a21 = this.values[9],
       a22 = this.values[10],
       a23 = this.values[11];
-    let a30 = this.values[12],
+    const a30 = this.values[12],
       a31 = this.values[13],
       a32 = this.values[14],
       a33 = this.values[15];
@@ -734,7 +732,7 @@ export class Matrix4 {
     dest: Vector3 | null = null
   ): Vector3 {
     if (!dest) dest = new Vector3();
-    let x = vector.x,
+    const x = vector.x,
       y = vector.y,
       z = vector.z;
 
@@ -763,7 +761,7 @@ export class Matrix4 {
   ): Vector4 {
     if (!dest) dest = new Vector4();
 
-    let x = vector.x,
+    const x = vector.x,
       y = vector.y,
       z = vector.z,
       w = vector.w;
@@ -794,7 +792,7 @@ export class Matrix4 {
 
   // 矩阵变换
   public translate(vector: Vector3): Matrix4 {
-    let x = vector.x,
+    const x = vector.x,
       y = vector.y,
       z = vector.z;
 
@@ -811,7 +809,7 @@ export class Matrix4 {
   }
 
   public scale(vector: Vector3): Matrix4 {
-    let x = vector.x,
+    const x = vector.x,
       y = vector.y,
       z = vector.z;
 
@@ -849,12 +847,12 @@ export class Matrix4 {
       z *= length;
     }
 
-    let s = Math.sin(angle);
-    let c = Math.cos(angle);
+    const s = Math.sin(angle);
+    const c = Math.cos(angle);
 
-    let t = 1.0 - c;
+    const t = 1.0 - c;
 
-    let a00 = this.values[0],
+    const a00 = this.values[0],
       a01 = this.values[1],
       a02 = this.values[2],
       a03 = this.values[3],
@@ -867,7 +865,7 @@ export class Matrix4 {
       a22 = this.values[10],
       a23 = this.values[11];
 
-    let b00 = x * x * t + c,
+    const b00 = x * x * t + c,
       b01 = y * x * t + z * s,
       b02 = z * x * t - y * s,
       b10 = x * y * t - z * s,
@@ -904,7 +902,7 @@ export class Matrix4 {
     near: number,
     far: number
   ): Matrix4 {
-    let rl = right - left,
+    const rl = right - left,
       tb = top - bottom,
       fn = far - near;
 
@@ -937,7 +935,7 @@ export class Matrix4 {
     near: number,
     far: number
   ): Matrix4 {
-    let top = near * Math.tan(fov * 0.5),
+    const top = near * Math.tan(fov * 0.5),
       right = top * aspect;
 
     return Matrix4.frustum(-right, right, -top, top, near, far);
@@ -951,7 +949,7 @@ export class Matrix4 {
     near: number,
     far: number
   ): Matrix4 {
-    let rl = right - left,
+    const rl = right - left,
       tb = top - bottom,
       fn = far - near;
 
@@ -987,9 +985,9 @@ export class Matrix4 {
       return this.identity;
     }
 
-    let z = Vector3.difference(position, target).normalize();
-    let x = Vector3.cross(up, z).normalize();
-    let y = Vector3.cross(z, x).normalize();
+    const z = Vector3.difference(position, target).normalize();
+    const x = Vector3.cross(up, z).normalize();
+    const y = Vector3.cross(z, x).normalize();
 
     return new Matrix4([
       x.x,
@@ -1014,12 +1012,8 @@ export class Matrix4 {
     ]);
   }
 
-  public static product(
-    m1: Matrix4,
-    m2: Matrix4,
-    result: Matrix4 | null = null
-  ): Matrix4 {
-    let a00 = m1.at(0),
+  public static product(m1: Matrix4, m2: Matrix4): Matrix4 {
+    const a00 = m1.at(0),
       a01 = m1.at(1),
       a02 = m1.at(2),
       a03 = m1.at(3),
@@ -1036,7 +1030,7 @@ export class Matrix4 {
       a32 = m1.at(14),
       a33 = m1.at(15);
 
-    let b00 = m2.at(0),
+    const b00 = m2.at(0),
       b01 = m2.at(1),
       b02 = m2.at(2),
       b03 = m2.at(3),
@@ -1073,12 +1067,7 @@ export class Matrix4 {
       b30 * a02 + b31 * a12 + b32 * a22 + b33 * a32,
       b30 * a03 + b31 * a13 + b32 * a23 + b33 * a33,
     ];
-    if (result) {
-      result.set(arr);
-      return result;
-    } else {
-      return new Matrix4(arr);
-    }
+    return new Matrix4(arr);
   }
 
   public static identity = new Matrix4().setIdentity();
@@ -1146,7 +1135,7 @@ export class quat {
   }
 
   public roll(): number {
-    let x = this.x,
+    const x = this.x,
       y = this.y,
       z = this.z,
       w = this.w;
@@ -1155,7 +1144,7 @@ export class quat {
   }
 
   public pitch(): number {
-    let x = this.x,
+    const x = this.x,
       y = this.y,
       z = this.z,
       w = this.w;
@@ -1185,7 +1174,7 @@ export class quat {
   }
 
   public calculateW(): quat {
-    let x = this.x,
+    const x = this.x,
       y = this.y,
       z = this.z;
 
@@ -1199,14 +1188,14 @@ export class quat {
   }
 
   public inverse(): quat {
-    let dot = quat.dot(this, this);
+    const dot = quat.dot(this, this);
 
     if (!dot) {
       this.setIdentity();
       return this;
     }
 
-    let invDot = dot ? 1.0 / dot : 0;
+    const invDot = dot ? 1.0 / dot : 0;
 
     this.x *= -invDot;
     this.y *= -invDot;
@@ -1225,7 +1214,7 @@ export class quat {
   }
 
   public length(): number {
-    let x = this.x,
+    const x = this.x,
       y = this.y,
       z = this.z,
       w = this.w;
@@ -1236,7 +1225,7 @@ export class quat {
   public normalize(dest: quat | null = null): quat {
     if (!dest) dest = this;
 
-    let x = this.x,
+    const x = this.x,
       y = this.y,
       z = this.z,
       w = this.w;
@@ -1272,12 +1261,12 @@ export class quat {
 
   // 这个是左到右结合 this.cross.other
   public multiply(other: quat): quat {
-    let q1x = this.values[0],
+    const q1x = this.values[0],
       q1y = this.values[1],
       q1z = this.values[2],
       q1w = this.values[3];
 
-    let q2x = other.x,
+    const q2x = other.x,
       q2y = other.y,
       q2z = other.z,
       q2w = other.w;
@@ -1296,17 +1285,17 @@ export class quat {
   ): Vector3 {
     if (!dest) dest = new Vector3();
 
-    let x = vector.x,
+    const x = vector.x,
       y = vector.y,
       z = vector.z;
 
-    let qx = this.x,
+    const qx = this.x,
       qy = this.y,
       qz = this.z,
       qw = this.w;
 
     //
-    let ix = qw * x + qy * z - qz * y,
+    const ix = qw * x + qy * z - qz * y,
       iy = qw * y + qz * x - qx * z,
       iz = qw * z + qx * y - qy * x,
       iw = -qx * x - qy * y - qz * z;
@@ -1321,7 +1310,7 @@ export class quat {
   public toMatrix4(dest: Matrix4 | null = null): Matrix4 {
     if (!dest) dest = new Matrix4();
 
-    let x = this.x,
+    const x = this.x,
       y = this.y,
       z = this.z,
       w = this.w,
@@ -1397,7 +1386,7 @@ export class quat {
   public static cross(q1: quat, q2: quat, dest: quat | null = null): quat {
     if (!dest) dest = new quat();
 
-    let q1x = q1.x,
+    const q1x = q1.x,
       q1y = q1.y,
       q1z = q1.z,
       q1w = q1.w,
@@ -1446,10 +1435,10 @@ export class quat {
       k0 = 1 - time;
       k1 = 0 + time;
     } else {
-      let sin: number = Math.sqrt(1 - cos * cos);
-      let angle: number = Math.atan2(sin, cos);
+      const sin: number = Math.sqrt(1 - cos * cos);
+      const angle: number = Math.atan2(sin, cos);
 
-      let oneOverSin: number = 1 / sin;
+      const oneOverSin: number = 1 / sin;
 
       k0 = Math.sin((1 - time) * angle) * oneOverSin;
       k1 = Math.sin((0 + time) * angle) * oneOverSin;
@@ -1471,14 +1460,14 @@ export class quat {
   ): quat {
     if (!dest) dest = new quat();
 
-    let cosHalfTheta = q1.x * q2.x + q1.y * q2.y + q1.z * q2.z + q1.w * q2.w;
+    const cosHalfTheta = q1.x * q2.x + q1.y * q2.y + q1.z * q2.z + q1.w * q2.w;
 
     if (Math.abs(cosHalfTheta) >= 1.0) {
       q1.copy(dest);
       return dest;
     }
 
-    let halfTheta = Math.acos(cosHalfTheta),
+    const halfTheta = Math.acos(cosHalfTheta),
       sinHalfTheta = Math.sqrt(1.0 - cosHalfTheta * cosHalfTheta);
 
     if (Math.abs(sinHalfTheta) < 0.001) {
@@ -1490,7 +1479,7 @@ export class quat {
       return dest;
     }
 
-    let ratioA = Math.sin((1 - time) * halfTheta) / sinHalfTheta,
+    const ratioA = Math.sin((1 - time) * halfTheta) / sinHalfTheta,
       ratioB = Math.sin(time * halfTheta) / sinHalfTheta;
 
     dest.x = q1.x * ratioA + q2.x * ratioB;
@@ -1509,7 +1498,7 @@ export class quat {
     if (!dest) dest = new quat();
 
     angle *= 0.5;
-    let sin = Math.sin(angle);
+    const sin = Math.sin(angle);
 
     dest.x = axis.x * sin;
     dest.y = axis.y * sin;
