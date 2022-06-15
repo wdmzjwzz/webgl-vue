@@ -1,5 +1,5 @@
 import { Vector2, Vector3, Vector4, Matrix4, quat } from "./math/TSM";
-import { GLHelper } from "./WebGLHepler";
+import { GLHelper } from "./GLHepler";
 
 export interface GLSetters {
   [key: string]: (...arg: unknown[]) => boolean;
@@ -41,7 +41,7 @@ export class GLProgram {
     GLHelper.linkProgram(this.gl, this.program, this.vsShader, this.fsShader);
 
     this.attribSetters = GLHelper.getAttribsSetters(this.gl, this.program);
-    GLHelper.logProgramAtciveUniforms(this.gl, this.program);
+    this.uniformSetters = GLHelper.getUniformsSetters(this.gl, this.program);
   }
 
   public bind(): void {

@@ -1,6 +1,7 @@
+/* eslint-disable */
 import { DataType } from ".";
 
-export const typeMap: { [key: number]: any } = {
+export const UniformSettersMap: { [key: number]: any } = {
   [DataType.FLOAT]: {
     Type: Float32Array,
     size: 4,
@@ -412,7 +413,7 @@ function samplerSetter(
   };
 }
 function getBindPointForSamplerType(type: number) {
-  return (typeMap as any)[type].bindPoint;
+  return (UniformSettersMap as any)[type].bindPoint;
 }
 
 function samplerArraySetter(
