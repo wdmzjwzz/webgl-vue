@@ -9,12 +9,15 @@ import vertexShader from "@/shaders/vertexShader_pointLight.vert";
 import fragmentShader from "@/shaders/fragmentShader_pointLight.frag";
 import { Matrix4, Vector3, Vector4 } from "./math/TSM";
 import { GLHelper } from "./WebGLHepler";
+import { PointLight } from "./Light/PointLight";
+import { BaseLight } from "./Light/BaseLight";
 export class CameraApplication extends Application {
   public camera: Camera; // 在WebGLApplication的基础上增加了对摄像机系统的支持
   public angle = 0; // 用来更新旋转角度
   public gl: WebGL2RenderingContext;
   public program: GLProgram;
   public vao: WebGLVertexArrayObject | null = null;
+  public light: BaseLight | null = null;
   uniformLocations: { [key: string]: WebGLUniformLocation | null } = {};
   public constructor(canvas: HTMLCanvasElement, camera: Camera) {
     super(canvas);
@@ -27,36 +30,60 @@ export class CameraApplication extends Application {
     this.program = program;
     this.camera = camera;
   }
-
+  public addLight(light: BaseLight) {
+    this.light = light;
+  }
   public update(elapsedMsec: number, intervalSec: number): void {
     this.camera.update(intervalSec);
   }
   public run(): void {
-
     const gl = this.gl;
     const program = this.program.program;
     // look up where the vertex data needs to go.
-    const positionAttributeLocation = gl.getAttribLocation(program, "a_position");
+    const positionAttributeLocation = gl.getAttribLocation(
+      program,
+      "a_position"
+    );
     const normalAttributeLocation = gl.getAttribLocation(program, "a_normal");
     // lookup uniforms
     // look up uniform locations
 
-    this.uniformLocations.worldViewProjectionLocation =
-      gl.getUniformLocation(program, "u_worldViewProjection");
-    this.uniformLocations.worldInverseTransposeLocation =
-      gl.getUniformLocation(program, "u_worldInverseTranspose");
-    this.uniformLocations.colorLocation = gl.getUniformLocation(program, "u_color");
-    this.uniformLocations.shininessLocation = gl.getUniformLocation(program, "u_shininess");
-    this.uniformLocations.lightWorldPositionLocation =
-      gl.getUniformLocation(program, "u_lightWorldPosition");
-    this.uniformLocations.viewWorldPositionLocation =
-      gl.getUniformLocation(program, "u_viewWorldPosition");
-    this.uniformLocations.worldLocation =
-      gl.getUniformLocation(program, "u_world");
-    this.uniformLocations.lightColorLocation =
-      gl.getUniformLocation(program, "u_lightColor");
-    this.uniformLocations.specularColorLocation =
-      gl.getUniformLocation(program, "u_specularColor");
+    this.uniformLocations.worldViewProjectionLocation = gl.getUniformLocation(
+      program,
+      "u_worldViewProjection"
+    );
+    this.uniformLocations.worldInverseTransposeLocation = gl.getUniformLocation(
+      program,
+      "u_worldInverseTranspose"
+    );
+    this.uniformLocations.colorLocation = gl.getUniformLocation(
+      program,
+      "u_color"
+    );
+    this.uniformLocations.shininessLocation = gl.getUniformLocation(
+      program,
+      "u_shininess"
+    );
+    this.uniformLocations.lightWorldPositionLocation = gl.getUniformLocation(
+      program,
+      "u_lightWorldPosition"
+    );
+    this.uniformLocations.viewWorldPositionLocation = gl.getUniformLocation(
+      program,
+      "u_viewWorldPosition"
+    );
+    this.uniformLocations.worldLocation = gl.getUniformLocation(
+      program,
+      "u_world"
+    );
+    this.uniformLocations.lightColorLocation = gl.getUniformLocation(
+      program,
+      "u_lightColor"
+    );
+    this.uniformLocations.specularColorLocation = gl.getUniformLocation(
+      program,
+      "u_specularColor"
+    );
 
     // Create a buffer and put a 2 points in it for 1 line
     const positionBuffer = gl.createBuffer();
@@ -64,7 +91,6 @@ export class CameraApplication extends Application {
     this.vao = gl.createVertexArray();
     if (!this.vao) {
       throw new Error("createVertexArray failed");
-
     }
     // and make it the one we're currently working with
     gl.bindVertexArray(this.vao);
@@ -74,18 +100,24 @@ export class CameraApplication extends Application {
 
     // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    this.setGeometry(gl)
+    this.setGeometry(gl);
 
     // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
 
     // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-    const size = 3;          // 3 components per iteration
-    const type = gl.FLOAT;   // the data is 32bit floats
+    const size = 3; // 3 components per iteration
+    const type = gl.FLOAT; // the data is 32bit floats
     const normalize = false; // don't normalize the data
-    const stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-    const offset = 0;        // start at the beginning of the buffer
+    const stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
+    const offset = 0; // start at the beginning of the buffer
     gl.vertexAttribPointer(
-      positionAttributeLocation, size, type, normalize, stride, offset);
+      positionAttributeLocation,
+      size,
+      type,
+      normalize,
+      stride,
+      offset
+    );
 
     // create the normalr buffer, make it the current ARRAY_BUFFER
     // and copy in the normal values
@@ -97,63 +129,92 @@ export class CameraApplication extends Application {
     gl.enableVertexAttribArray(normalAttributeLocation);
 
     gl.vertexAttribPointer(
-      normalAttributeLocation, size, type, normalize, stride, offset);
+      normalAttributeLocation,
+      size,
+      type,
+      normalize,
+      stride,
+      offset
+    );
     super.run();
   }
   public render(): void {
-    this.angle += 0.01
-    GLHelper.setDefaultState(this.gl)
-    this.program.bind()
+    this.angle += 0.01;
+    GLHelper.setDefaultState(this.gl);
+    this.program.bind();
     this.gl.bindVertexArray(this.vao);
 
     // create a viewProjection matrix. This will both apply perspective
     // AND move the world so that the camera is effectively the origin
-    const viewProjectionMatrix = this.camera.viewProjectionMatrix
+    const viewProjectionMatrix = this.camera.viewProjectionMatrix;
 
     // Draw a F at the origin with rotation
-    let worldMatrix = new Matrix4()
-    worldMatrix = worldMatrix.rotate(this.angle, Vector3.up)!
-    const worldViewProjectionMatrix = Matrix4.product(viewProjectionMatrix, worldMatrix);
+    let worldMatrix = new Matrix4();
+    worldMatrix = worldMatrix.rotate(this.angle, Vector3.up)!;
+    const worldViewProjectionMatrix = Matrix4.product(
+      viewProjectionMatrix,
+      worldMatrix
+    );
 
-    const worldInverseMatrix = worldMatrix.copy().inverse()
+    const worldInverseMatrix = worldMatrix.copy().inverse();
     const worldInverseTransposeMatrix = worldInverseMatrix.copy().transpose();
-
 
     // Set the matrices
     this.gl.uniformMatrix4fv(
-      this.uniformLocations.worldLocation, false,
-      worldMatrix.values);
+      this.uniformLocations.worldLocation,
+      false,
+      worldMatrix.values
+    );
     this.gl.uniformMatrix4fv(
-      this.uniformLocations.worldViewProjectionLocation, false,
-      worldViewProjectionMatrix.values);
+      this.uniformLocations.worldViewProjectionLocation,
+      false,
+      worldViewProjectionMatrix.values
+    );
     this.gl.uniformMatrix4fv(
-      this.uniformLocations.worldInverseTransposeLocation, false,
-      worldInverseTransposeMatrix.values);
+      this.uniformLocations.worldInverseTransposeLocation,
+      false,
+      worldInverseTransposeMatrix.values
+    );
 
     // Set the color to use
     this.gl.uniform4fv(this.uniformLocations.colorLocation, [0.2, 1, 0.2, 1]); // green
 
     // set the light position
-    this.gl.uniform3fv(this.uniformLocations.lightWorldPositionLocation, [200, 300, 400]);
+    this.gl.uniform3fv(
+      this.uniformLocations.lightWorldPositionLocation,
+      [200, 300, 400]
+    );
 
     // set the camera/view position
-    this.gl.uniform3fv(this.uniformLocations.viewWorldPositionLocation, this.camera.position.values);
+    this.gl.uniform3fv(
+      this.uniformLocations.viewWorldPositionLocation,
+      this.camera.position.values
+    );
 
     // set the shininess
     this.gl.uniform1f(this.uniformLocations.shininessLocation, 50);
 
     // set the light color
-    this.gl.uniform3fv(this.uniformLocations.lightColorLocation, new Vector3([1, 0.6, 0.6]).normalize().values);  // red light
+    this.gl.uniform3fv(
+      this.uniformLocations.lightColorLocation,
+      new Vector3([1, 0.6, 0.6]).normalize().values
+    ); // red light
 
     // set the specular color
-    this.gl.uniform3fv(this.uniformLocations.specularColorLocation, new Vector3([1, 0.2, 0.2]).normalize().values);  // red light
+    this.gl.uniform3fv(
+      this.uniformLocations.specularColorLocation,
+      new Vector3([1, 0.2, 0.2]).normalize().values
+    ); // red light
 
-    const mat = new Vector3([0, 0, 1]).normalize()
+    const mat = new Vector3([0, 0, 1]).normalize();
 
     // set the light direction.
     // this.gl.uniform3fv(this.uniformLocations.reverseLightDirectionLocation, mat.values);
 
-    this.gl.uniform3fv(this.uniformLocations.lightWorldPositionLocation, [100, 120, 100]);
+    this.gl.uniform3fv(
+      this.uniformLocations.lightWorldPositionLocation,
+      [100, 120, 100]
+    );
     // Draw the geometry.
     const primitiveType = this.gl.TRIANGLES;
     const offset = 0;
@@ -163,132 +224,52 @@ export class CameraApplication extends Application {
   setGeometry(gl: WebGL2RenderingContext) {
     var positions = new Float32Array([
       // left column front
-      0, 0, 0,
-      0, 150, 0,
-      30, 0, 0,
-      0, 150, 0,
-      30, 150, 0,
-      30, 0, 0,
+      0, 0, 0, 0, 150, 0, 30, 0, 0, 0, 150, 0, 30, 150, 0, 30, 0, 0,
 
       // top rung front
-      30, 0, 0,
-      30, 30, 0,
-      100, 0, 0,
-      30, 30, 0,
-      100, 30, 0,
-      100, 0, 0,
+      30, 0, 0, 30, 30, 0, 100, 0, 0, 30, 30, 0, 100, 30, 0, 100, 0, 0,
 
       // middle rung front
-      30, 60, 0,
-      30, 90, 0,
-      67, 60, 0,
-      30, 90, 0,
-      67, 90, 0,
-      67, 60, 0,
+      30, 60, 0, 30, 90, 0, 67, 60, 0, 30, 90, 0, 67, 90, 0, 67, 60, 0,
 
       // left column back
-      0, 0, 30,
-      30, 0, 30,
-      0, 150, 30,
-      0, 150, 30,
-      30, 0, 30,
-      30, 150, 30,
+      0, 0, 30, 30, 0, 30, 0, 150, 30, 0, 150, 30, 30, 0, 30, 30, 150, 30,
 
       // top rung back
-      30, 0, 30,
-      100, 0, 30,
-      30, 30, 30,
-      30, 30, 30,
-      100, 0, 30,
-      100, 30, 30,
+      30, 0, 30, 100, 0, 30, 30, 30, 30, 30, 30, 30, 100, 0, 30, 100, 30, 30,
 
       // middle rung back
-      30, 60, 30,
-      67, 60, 30,
-      30, 90, 30,
-      30, 90, 30,
-      67, 60, 30,
-      67, 90, 30,
+      30, 60, 30, 67, 60, 30, 30, 90, 30, 30, 90, 30, 67, 60, 30, 67, 90, 30,
 
       // top
-      0, 0, 0,
-      100, 0, 0,
-      100, 0, 30,
-      0, 0, 0,
-      100, 0, 30,
-      0, 0, 30,
+      0, 0, 0, 100, 0, 0, 100, 0, 30, 0, 0, 0, 100, 0, 30, 0, 0, 30,
 
       // top rung right
-      100, 0, 0,
-      100, 30, 0,
-      100, 30, 30,
-      100, 0, 0,
-      100, 30, 30,
-      100, 0, 30,
+      100, 0, 0, 100, 30, 0, 100, 30, 30, 100, 0, 0, 100, 30, 30, 100, 0, 30,
 
       // under top rung
-      30, 30, 0,
-      30, 30, 30,
-      100, 30, 30,
-      30, 30, 0,
-      100, 30, 30,
-      100, 30, 0,
+      30, 30, 0, 30, 30, 30, 100, 30, 30, 30, 30, 0, 100, 30, 30, 100, 30, 0,
 
       // between top rung and middle
-      30, 30, 0,
-      30, 60, 30,
-      30, 30, 30,
-      30, 30, 0,
-      30, 60, 0,
-      30, 60, 30,
+      30, 30, 0, 30, 60, 30, 30, 30, 30, 30, 30, 0, 30, 60, 0, 30, 60, 30,
 
       // top of middle rung
-      30, 60, 0,
-      67, 60, 30,
-      30, 60, 30,
-      30, 60, 0,
-      67, 60, 0,
-      67, 60, 30,
+      30, 60, 0, 67, 60, 30, 30, 60, 30, 30, 60, 0, 67, 60, 0, 67, 60, 30,
 
       // right of middle rung
-      67, 60, 0,
-      67, 90, 30,
-      67, 60, 30,
-      67, 60, 0,
-      67, 90, 0,
-      67, 90, 30,
+      67, 60, 0, 67, 90, 30, 67, 60, 30, 67, 60, 0, 67, 90, 0, 67, 90, 30,
 
       // bottom of middle rung.
-      30, 90, 0,
-      30, 90, 30,
-      67, 90, 30,
-      30, 90, 0,
-      67, 90, 30,
-      67, 90, 0,
+      30, 90, 0, 30, 90, 30, 67, 90, 30, 30, 90, 0, 67, 90, 30, 67, 90, 0,
 
       // right of bottom
-      30, 90, 0,
-      30, 150, 30,
-      30, 90, 30,
-      30, 90, 0,
-      30, 150, 0,
-      30, 150, 30,
+      30, 90, 0, 30, 150, 30, 30, 90, 30, 30, 90, 0, 30, 150, 0, 30, 150, 30,
 
       // bottom
-      0, 150, 0,
-      0, 150, 30,
-      30, 150, 30,
-      0, 150, 0,
-      30, 150, 30,
-      30, 150, 0,
+      0, 150, 0, 0, 150, 30, 30, 150, 30, 0, 150, 0, 30, 150, 30, 30, 150, 0,
 
       // left side
-      0, 0, 0,
-      0, 0, 30,
-      0, 150, 30,
-      0, 0, 0,
-      0, 150, 30,
-      0, 150, 0,
+      0, 0, 0, 0, 0, 30, 0, 150, 30, 0, 0, 0, 0, 150, 30, 0, 150, 0,
     ]);
 
     // Center the F around the origin and Flip it around. We do this because
@@ -299,12 +280,17 @@ export class CameraApplication extends Application {
     // We could also do it with a matrix at draw time but you should
     // never do stuff at draw time if you can do it at init time.
     let matrix = new Matrix4();
-    matrix = matrix.rotate(Math.PI, Vector3.right)!
+    matrix = matrix.rotate(Math.PI, Vector3.right)!;
     matrix = matrix.translate(new Vector3([-50, -75, -15]));
 
     for (var ii = 0; ii < positions.length; ii += 3) {
-      const vector = new Vector4([positions[ii + 0], positions[ii + 1], positions[ii + 2], 1])
-      const translateVector = matrix.multiplyVector4(vector)
+      const vector = new Vector4([
+        positions[ii + 0],
+        positions[ii + 1],
+        positions[ii + 2],
+        1,
+      ]);
+      const translateVector = matrix.multiplyVector4(vector);
       positions[ii + 0] = translateVector.x;
       positions[ii + 1] = translateVector.y;
       positions[ii + 2] = translateVector.z;
@@ -315,132 +301,52 @@ export class CameraApplication extends Application {
   setNormals(gl: WebGL2RenderingContext) {
     var normals = new Float32Array([
       // left column front
-      0, 0, 1,
-      0, 0, 1,
-      0, 0, 1,
-      0, 0, 1,
-      0, 0, 1,
-      0, 0, 1,
+      0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
 
       // top rung front
-      0, 0, 1,
-      0, 0, 1,
-      0, 0, 1,
-      0, 0, 1,
-      0, 0, 1,
-      0, 0, 1,
+      0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
 
       // middle rung front
-      0, 0, 1,
-      0, 0, 1,
-      0, 0, 1,
-      0, 0, 1,
-      0, 0, 1,
-      0, 0, 1,
+      0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
 
       // left column back
-      0, 0, -1,
-      0, 0, -1,
-      0, 0, -1,
-      0, 0, -1,
-      0, 0, -1,
-      0, 0, -1,
+      0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,
 
       // top rung back
-      0, 0, -1,
-      0, 0, -1,
-      0, 0, -1,
-      0, 0, -1,
-      0, 0, -1,
-      0, 0, -1,
+      0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,
 
       // middle rung back
-      0, 0, -1,
-      0, 0, -1,
-      0, 0, -1,
-      0, 0, -1,
-      0, 0, -1,
-      0, 0, -1,
+      0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,
 
       // top
-      0, 1, 0,
-      0, 1, 0,
-      0, 1, 0,
-      0, 1, 0,
-      0, 1, 0,
-      0, 1, 0,
+      0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
 
       // top rung right
-      1, 0, 0,
-      1, 0, 0,
-      1, 0, 0,
-      1, 0, 0,
-      1, 0, 0,
-      1, 0, 0,
+      1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
 
       // under top rung
-      0, -1, 0,
-      0, -1, 0,
-      0, -1, 0,
-      0, -1, 0,
-      0, -1, 0,
-      0, -1, 0,
+      0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
 
       // between top rung and middle
-      1, 0, 0,
-      1, 0, 0,
-      1, 0, 0,
-      1, 0, 0,
-      1, 0, 0,
-      1, 0, 0,
+      1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
 
       // top of middle rung
-      0, 1, 0,
-      0, 1, 0,
-      0, 1, 0,
-      0, 1, 0,
-      0, 1, 0,
-      0, 1, 0,
+      0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
 
       // right of middle rung
-      1, 0, 0,
-      1, 0, 0,
-      1, 0, 0,
-      1, 0, 0,
-      1, 0, 0,
-      1, 0, 0,
+      1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
 
       // bottom of middle rung.
-      0, -1, 0,
-      0, -1, 0,
-      0, -1, 0,
-      0, -1, 0,
-      0, -1, 0,
-      0, -1, 0,
+      0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
 
       // right of bottom
-      1, 0, 0,
-      1, 0, 0,
-      1, 0, 0,
-      1, 0, 0,
-      1, 0, 0,
-      1, 0, 0,
+      1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
 
       // bottom
-      0, -1, 0,
-      0, -1, 0,
-      0, -1, 0,
-      0, -1, 0,
-      0, -1, 0,
-      0, -1, 0,
+      0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
 
       // left side
-      -1, 0, 0,
-      -1, 0, 0,
-      -1, 0, 0,
-      -1, 0, 0,
-      -1, 0, 0,
-      -1, 0, 0,
+      -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0,
     ]);
     gl.bufferData(gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW);
   }

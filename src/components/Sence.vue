@@ -9,9 +9,10 @@ import { Options, Vue } from "vue-class-component";
 import { GLProgram } from "@/webglUtils/GLProgram";
 import { CameraApplication } from "@/webglUtils/CameraApplication";
 import { Camera } from "@/webglUtils/Camera";
+import { PointLight } from "@/webglUtils/Light/PointLight";
+import { Vector3 } from "@/webglUtils/math/TSM";
 @Options({
-  props: {
-  },
+  props: {},
 })
 export default class Sence extends Vue {
   app: CameraApplication | null = null;
@@ -21,8 +22,15 @@ export default class Sence extends Vue {
     this.resizeCanvasToDisplaySize(canvas);
     const camera = new Camera(canvas.width, canvas.height, 45, 0.1, 1000);
     camera.z = 500;
-    const app = new CameraApplication(canvas, camera);
-    app.run();
+    const sence = new CameraApplication(canvas, camera);
+    const pointLight = new PointLight(
+      new Vector3([200, 300, 400]),
+      50,
+      new Vector3([1, 0.2, 0.2]),
+      new Vector3([1, 0.6, 0.6])
+    );
+    sence.addLight(pointLight);
+    sence.run();
   }
 
   resizeCanvasToDisplaySize(canvas: HTMLCanvasElement): boolean {

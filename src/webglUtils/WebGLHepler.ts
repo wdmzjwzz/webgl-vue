@@ -1,3 +1,5 @@
+import { AttrSetterMap } from "./constants/attriMap";
+
 export enum EGLSLESDataType {
   FLOAT_Vector2 = 0x8b50,
   FLOAT_Vector3,
@@ -49,7 +51,7 @@ export class GLHelper {
     );
     console.log(
       "6. isSampleAlphtToCoverageEnable = " +
-      gl.isEnabled(gl.SAMPLE_ALPHA_TO_COVERAGE)
+        gl.isEnabled(gl.SAMPLE_ALPHA_TO_COVERAGE)
     );
     console.log(
       "7. isSampleCoverageEnable = " + gl.isEnabled(gl.SAMPLE_COVERAGE)
@@ -110,7 +112,6 @@ export class GLHelper {
     gl.enable(gl.DEPTH_TEST);
     // tell webgl to cull faces
     gl.enable(gl.CULL_FACE);
-
   }
 
   public static compileShader(
@@ -166,29 +167,29 @@ export class GLHelper {
     }
   }
 
-  public static logProgramActiveAttribs(
+  public static getAttribsSetters(
     gl: WebGL2RenderingContext,
     program: WebGLProgram
   ) {
-    //获取当前active状态的attribute和uniform的数量
-    //很重要一点，active_attributes/uniforms必须在link后才能获得
     const attributsCount: number = gl.getProgramParameter(
       program,
       gl.ACTIVE_ATTRIBUTES
     );
-    const out: GLAttribInfoMap = {};
-    //很重要一点，所谓active是指uniform已经被使用的，否则不属于uniform,uniform在shader中必须是读取，不能赋值
-    //很重要一点，attribute在shader中只能读取，不能赋值,如果没有被使用的话，也是不算入activeAttrib中去的
-    for (let i = 0; i < attributsCount; i++) {
-      const info: WebGLActiveInfo = gl.getActiveAttrib(program, i)!;
+    const attribSetters: any = {};
 
-      out[info.name] = new GLAttribInfo(
-        info.size,
-        info.type,
-        gl.getAttribLocation(program, info.name)
-      );
+    for (let i = 0; i < attributsCount; ++i) {
+      const attribInfo = gl.getActiveAttrib(program, i);
+      if (!attribInfo) {
+        continue;
+      }
+      const index = gl.getAttribLocation(program, attribInfo.name);
+      const typeInfo = AttrSetterMap[attribInfo.type];
+      const setter = typeInfo.setter(gl, index, typeInfo);
+      setter.location = index;
+      attribSetters[attribInfo.name] = setter;
     }
-    console.log(JSON.stringify(out));
+
+    return attribSetters;
   }
 
   public static logProgramAtciveUniforms(

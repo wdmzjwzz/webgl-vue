@@ -40,7 +40,7 @@ export class GLProgram {
     GLHelper.compileShader(this.gl, fs, this.fsShader);
     GLHelper.linkProgram(this.gl, this.program, this.vsShader, this.fsShader);
 
-    GLHelper.logProgramActiveAttribs(this.gl, this.program);
+    this.attribSetters = GLHelper.getAttribsSetters(this.gl, this.program);
     GLHelper.logProgramAtciveUniforms(this.gl, this.program);
   }
 
