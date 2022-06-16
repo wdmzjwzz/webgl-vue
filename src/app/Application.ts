@@ -1,5 +1,8 @@
 /* eslint-disable */
-import { Vector2 } from "./math/TSM";
+
+import { Vector2 } from "@/webglUtils/math/TSM";
+
+ 
 
 export enum EInputEventType {
   MOUSEEVENT, //总类，表示鼠标事件

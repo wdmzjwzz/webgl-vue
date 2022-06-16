@@ -1,18 +1,18 @@
 /* eslint-disable */
 import { Application, CanvasKeyBoardEvent } from "./Application";
-import { Camera } from "./Camera";
-import { GLProgram, GLSetters } from "./GLProgram";
+import { Camera } from "../webglUtils/Camera";
+import { GLProgram, GLSetters } from "../webglUtils/GLProgram";
 // import vertexShader from "@/shaders/vertexShader.vert";
 // import fragmentShader from "@/shaders/fragmentShader.frag";
 
 import vertexShader from "@/shaders/vertexShader_pointLight.vert";
 import fragmentShader from "@/shaders/fragmentShader_pointLight.frag";
-import { Matrix4, Vector3, Vector4 } from "./math/TSM";
-import { GLHelper } from "./GLHepler";
-import { PointLight } from "./Light/PointLight";
-import { BaseLight } from "./Light/BaseLight";
-import { BufferInfo, BufferInfoCreater } from "./GLBufferInfo";
-import { GLWorldMatrixStack } from "./GLMatrixStack";
+import { Matrix4, Vector3, Vector4 } from "../webglUtils/math/TSM";
+import { GLHelper } from "../webglUtils/GLHepler";
+import { PointLight } from "../webglUtils/Light/PointLight";
+import { BaseLight } from "../webglUtils/Light/BaseLight";
+import { BufferInfo, BufferInfoCreater } from "../webglUtils/GLBufferInfo";
+import { GLWorldMatrixStack } from "../webglUtils/GLMatrixStack";
 export class CameraApplication extends Application {
   public camera: Camera; // 在WebGLApplication的基础上增加了对摄像机系统的支持
   public angle = 0; // 用来更新旋转角度
@@ -47,65 +47,80 @@ export class CameraApplication extends Application {
   public update(elapsedMsec: number, intervalSec: number): void {
     this.camera.update(intervalSec);
   }
+  setGeometry() {
+    var positions = new Float32Array([
+      // left column front
+      0, 0, 0, 0, 150, 0, 30, 0, 0, 0, 150, 0, 30, 150, 0, 30, 0, 0,
 
+      // top rung front
+      30, 0, 0, 30, 30, 0, 100, 0, 0, 30, 30, 0, 100, 30, 0, 100, 0, 0,
+
+      // middle rung front
+      30, 60, 0, 30, 90, 0, 67, 60, 0, 30, 90, 0, 67, 90, 0, 67, 60, 0,
+
+      // left column back
+      0, 0, 30, 30, 0, 30, 0, 150, 30, 0, 150, 30, 30, 0, 30, 30, 150, 30,
+
+      // top rung back
+      30, 0, 30, 100, 0, 30, 30, 30, 30, 30, 30, 30, 100, 0, 30, 100, 30, 30,
+
+      // middle rung back
+      30, 60, 30, 67, 60, 30, 30, 90, 30, 30, 90, 30, 67, 60, 30, 67, 90, 30,
+
+      // top
+      0, 0, 0, 100, 0, 0, 100, 0, 30, 0, 0, 0, 100, 0, 30, 0, 0, 30,
+
+      // top rung right
+      100, 0, 0, 100, 30, 0, 100, 30, 30, 100, 0, 0, 100, 30, 30, 100, 0, 30,
+
+      // under top rung
+      30, 30, 0, 30, 30, 30, 100, 30, 30, 30, 30, 0, 100, 30, 30, 100, 30, 0,
+
+      // between top rung and middle
+      30, 30, 0, 30, 60, 30, 30, 30, 30, 30, 30, 0, 30, 60, 0, 30, 60, 30,
+
+      // top of middle rung
+      30, 60, 0, 67, 60, 30, 30, 60, 30, 30, 60, 0, 67, 60, 0, 67, 60, 30,
+
+      // right of middle rung
+      67, 60, 0, 67, 90, 30, 67, 60, 30, 67, 60, 0, 67, 90, 0, 67, 90, 30,
+
+      // bottom of middle rung.
+      30, 90, 0, 30, 90, 30, 67, 90, 30, 30, 90, 0, 67, 90, 30, 67, 90, 0,
+
+      // right of bottom
+      30, 90, 0, 30, 150, 30, 30, 90, 30, 30, 90, 0, 30, 150, 0, 30, 150, 30,
+
+      // bottom
+      0, 150, 0, 0, 150, 30, 30, 150, 30, 0, 150, 0, 30, 150, 30, 30, 150, 0,
+
+      // left side
+      0, 0, 0, 0, 0, 30, 0, 150, 30, 0, 0, 0, 0, 150, 30, 0, 150, 0,
+    ]);
+ 
+    let mat = new Matrix4();
+    let matrix = mat.translate(new Vector3([0, 50, 0]));
+    matrix = matrix.rotate(Math.PI, Vector3.right)!; 
+    for (var ii = 0; ii < positions.length; ii += 3) {
+      const vector = matrix.multiplyVector3(
+        new Vector3([
+          positions[ii + 0],
+          positions[ii + 1],
+          positions[ii + 2],
+          1,
+        ])
+      )!;
+      positions[ii + 0] = vector.x;
+      positions[ii + 1] = vector.y;
+      positions[ii + 2] = vector.z;
+    }
+
+    return positions;
+  }
   initData() {
     this.bufferInfo = BufferInfoCreater.createBufferInfoFromArrays(this.gl, {
       a_position: {
-        data: new Float32Array([
-          // left column front
-          0, 0, 0, 0, 150, 0, 30, 0, 0, 0, 150, 0, 30, 150, 0, 30, 0, 0,
-
-          // top rung front
-          30, 0, 0, 30, 30, 0, 100, 0, 0, 30, 30, 0, 100, 30, 0, 100, 0, 0,
-
-          // middle rung front
-          30, 60, 0, 30, 90, 0, 67, 60, 0, 30, 90, 0, 67, 90, 0, 67, 60, 0,
-
-          // left column back
-          0, 0, 30, 30, 0, 30, 0, 150, 30, 0, 150, 30, 30, 0, 30, 30, 150, 30,
-
-          // top rung back
-          30, 0, 30, 100, 0, 30, 30, 30, 30, 30, 30, 30, 100, 0, 30, 100, 30,
-          30,
-
-          // middle rung back
-          30, 60, 30, 67, 60, 30, 30, 90, 30, 30, 90, 30, 67, 60, 30, 67, 90,
-          30,
-
-          // top
-          0, 0, 0, 100, 0, 0, 100, 0, 30, 0, 0, 0, 100, 0, 30, 0, 0, 30,
-
-          // top rung right
-          100, 0, 0, 100, 30, 0, 100, 30, 30, 100, 0, 0, 100, 30, 30, 100, 0,
-          30,
-
-          // under top rung
-          30, 30, 0, 30, 30, 30, 100, 30, 30, 30, 30, 0, 100, 30, 30, 100, 30,
-          0,
-
-          // between top rung and middle
-          30, 30, 0, 30, 60, 30, 30, 30, 30, 30, 30, 0, 30, 60, 0, 30, 60, 30,
-
-          // top of middle rung
-          30, 60, 0, 67, 60, 30, 30, 60, 30, 30, 60, 0, 67, 60, 0, 67, 60, 30,
-
-          // right of middle rung
-          67, 60, 0, 67, 90, 30, 67, 60, 30, 67, 60, 0, 67, 90, 0, 67, 90, 30,
-
-          // bottom of middle rung.
-          30, 90, 0, 30, 90, 30, 67, 90, 30, 30, 90, 0, 67, 90, 30, 67, 90, 0,
-
-          // right of bottom
-          30, 90, 0, 30, 150, 30, 30, 90, 30, 30, 90, 0, 30, 150, 0, 30, 150,
-          30,
-
-          // bottom
-          0, 150, 0, 0, 150, 30, 30, 150, 30, 0, 150, 0, 30, 150, 30, 30, 150,
-          0,
-
-          // left side
-          0, 0, 0, 0, 0, 30, 0, 150, 30, 0, 0, 0, 0, 150, 30, 0, 150, 0,
-        ]),
+        data: new Float32Array(this.setGeometry()),
         numComponents: 3,
       },
       a_normal: {

@@ -5,9 +5,8 @@
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import { GLProgram } from "@/webglUtils/GLProgram";
-import { CameraApplication } from "@/webglUtils/CameraApplication";
+import { Options, Vue } from "vue-class-component"; 
+import { CameraApplication } from "@/app/CameraApplication";
 import { Camera } from "@/webglUtils/Camera";
 import { PointLight } from "@/webglUtils/Light/PointLight";
 import { Vector3 } from "@/webglUtils/math/TSM";
@@ -24,7 +23,7 @@ export default class Sence extends Vue {
     camera.z = 500;
     const sence = new CameraApplication(canvas, camera);
     const pointLight = new PointLight(
-      new Vector3([200, 300, 400]),
+      new Vector3([0, 0, 100]),
       50,
       new Vector3([1, 0.2, 0.2]),
       new Vector3([1, 0.6, 0.6])
