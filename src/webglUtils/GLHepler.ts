@@ -54,7 +54,7 @@ export class GLHelper {
     );
     console.log(
       "6. isSampleAlphtToCoverageEnable = " +
-        gl.isEnabled(gl.SAMPLE_ALPHA_TO_COVERAGE)
+      gl.isEnabled(gl.SAMPLE_ALPHA_TO_COVERAGE)
     );
     console.log(
       "7. isSampleCoverageEnable = " + gl.isEnabled(gl.SAMPLE_COVERAGE)
@@ -214,12 +214,16 @@ export class GLHelper {
       let setter;
       const type = uniformInfo.type;
       const typeInfo = UniformSettersMap[type];
-      console.log(name, typeInfo, type);
-
+      if (typeInfo.bindPoint) {
+        // it's a sampler
+        const unit = 0;
+        setter = typeInfo.setter(gl, type, unit, location, uniformInfo.size);
+      } else {
+        setter = typeInfo.setter(gl, location);
+      } 
       if (!typeInfo) {
         throw new Error(`unknown type: 0x${type.toString(16)}`); // we should never get here.
-      }
-      setter = typeInfo.setter(gl, location);
+      } 
       setter.location = location;
       uniformSetters[name] = setter;
     }

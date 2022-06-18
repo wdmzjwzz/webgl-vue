@@ -13,6 +13,10 @@ import { PointLight } from "../webglUtils/Light/PointLight";
 import { BaseLight } from "../webglUtils/Light/BaseLight";
 import { BufferInfo, BufferInfoCreater } from "../webglUtils/GLBufferInfo";
 import { GLWorldMatrixStack } from "../webglUtils/GLMatrixStack";
+import GLTexture from "@/webglUtils/GLTexture";
+import { HttpRequest } from "@/webglUtils/HttpRequest";
+
+
 export class TextureApplication extends Application {
   public camera: Camera; // 在WebGLApplication的基础上增加了对摄像机系统的支持
   public angle = 0; // 用来更新旋转角度
@@ -49,148 +53,220 @@ export class TextureApplication extends Application {
   }
   setGeometry() {
     var positions = new Float32Array([
-        // left column front
-        0, 0, 0, 0, 150, 0, 30, 0, 0, 0, 150, 0, 30, 150, 0, 30, 0, 0,
-  
-        // top rung front
-        30, 0, 0, 30, 30, 0, 100, 0, 0, 30, 30, 0, 100, 30, 0, 100, 0, 0,
-  
-        // middle rung front
-        30, 60, 0, 30, 90, 0, 67, 60, 0, 30, 90, 0, 67, 90, 0, 67, 60, 0,
-  
-        // left column back
-        0, 0, 30, 30, 0, 30, 0, 150, 30, 0, 150, 30, 30, 0, 30, 30, 150, 30,
-  
-        // top rung back
-        30, 0, 30, 100, 0, 30, 30, 30, 30, 30, 30, 30, 100, 0, 30, 100, 30, 30,
-  
-        // middle rung back
-        30, 60, 30, 67, 60, 30, 30, 90, 30, 30, 90, 30, 67, 60, 30, 67, 90, 30,
-  
-        // top
-        0, 0, 0, 100, 0, 0, 100, 0, 30, 0, 0, 0, 100, 0, 30, 0, 0, 30,
-  
-        // top rung right
-        100, 0, 0, 100, 30, 0, 100, 30, 30, 100, 0, 0, 100, 30, 30, 100, 0, 30,
-  
-        // under top rung
-        30, 30, 0, 30, 30, 30, 100, 30, 30, 30, 30, 0, 100, 30, 30, 100, 30, 0,
-  
-        // between top rung and middle
-        30, 30, 0, 30, 60, 30, 30, 30, 30, 30, 30, 0, 30, 60, 0, 30, 60, 30,
-  
-        // top of middle rung
-        30, 60, 0, 67, 60, 30, 30, 60, 30, 30, 60, 0, 67, 60, 0, 67, 60, 30,
-  
-        // right of middle rung
-        67, 60, 0, 67, 90, 30, 67, 60, 30, 67, 60, 0, 67, 90, 0, 67, 90, 30,
-  
-        // bottom of middle rung.
-        30, 90, 0, 30, 90, 30, 67, 90, 30, 30, 90, 0, 67, 90, 30, 67, 90, 0,
-  
-        // right of bottom
-        30, 90, 0, 30, 150, 30, 30, 90, 30, 30, 90, 0, 30, 150, 0, 30, 150, 30,
-  
-        // bottom
-        0, 150, 0, 0, 150, 30, 30, 150, 30, 0, 150, 0, 30, 150, 30, 30, 150, 0,
-  
-        // left side
-        0, 0, 0, 0, 0, 30, 0, 150, 30, 0, 0, 0, 0, 150, 30, 0, 150, 0,
-      ]);
-   
-      let mat = new Matrix4();
-      let matrix = mat.translate(new Vector3([0, 50, 0]));
-      matrix = matrix.rotate(Math.PI, Vector3.right)!; 
-      for (var ii = 0; ii < positions.length; ii += 3) {
-        const vector = matrix.multiplyVector3(
-          new Vector3([
-            positions[ii + 0],
-            positions[ii + 1],
-            positions[ii + 2],
-            1,
-          ])
-        )!;
-        positions[ii + 0] = vector.x;
-        positions[ii + 1] = vector.y;
-        positions[ii + 2] = vector.z;
-      }
-  
-      return positions;
+      // left column front
+      0, 0, 0, 0, 150, 0, 30, 0, 0, 0, 150, 0, 30, 150, 0, 30, 0, 0,
+
+      // top rung front
+      30, 0, 0, 30, 30, 0, 100, 0, 0, 30, 30, 0, 100, 30, 0, 100, 0, 0,
+
+      // middle rung front
+      30, 60, 0, 30, 90, 0, 67, 60, 0, 30, 90, 0, 67, 90, 0, 67, 60, 0,
+
+      // left column back
+      0, 0, 30, 30, 0, 30, 0, 150, 30, 0, 150, 30, 30, 0, 30, 30, 150, 30,
+
+      // top rung back
+      30, 0, 30, 100, 0, 30, 30, 30, 30, 30, 30, 30, 100, 0, 30, 100, 30, 30,
+
+      // middle rung back
+      30, 60, 30, 67, 60, 30, 30, 90, 30, 30, 90, 30, 67, 60, 30, 67, 90, 30,
+
+      // top
+      0, 0, 0, 100, 0, 0, 100, 0, 30, 0, 0, 0, 100, 0, 30, 0, 0, 30,
+
+      // top rung right
+      100, 0, 0, 100, 30, 0, 100, 30, 30, 100, 0, 0, 100, 30, 30, 100, 0, 30,
+
+      // under top rung
+      30, 30, 0, 30, 30, 30, 100, 30, 30, 30, 30, 0, 100, 30, 30, 100, 30, 0,
+
+      // between top rung and middle
+      30, 30, 0, 30, 60, 30, 30, 30, 30, 30, 30, 0, 30, 60, 0, 30, 60, 30,
+
+      // top of middle rung
+      30, 60, 0, 67, 60, 30, 30, 60, 30, 30, 60, 0, 67, 60, 0, 67, 60, 30,
+
+      // right of middle rung
+      67, 60, 0, 67, 90, 30, 67, 60, 30, 67, 60, 0, 67, 90, 0, 67, 90, 30,
+
+      // bottom of middle rung.
+      30, 90, 0, 30, 90, 30, 67, 90, 30, 30, 90, 0, 67, 90, 30, 67, 90, 0,
+
+      // right of bottom
+      30, 90, 0, 30, 150, 30, 30, 90, 30, 30, 90, 0, 30, 150, 0, 30, 150, 30,
+
+      // bottom
+      0, 150, 0, 0, 150, 30, 30, 150, 30, 0, 150, 0, 30, 150, 30, 30, 150, 0,
+
+      // left side
+      0, 0, 0, 0, 0, 30, 0, 150, 30, 0, 0, 0, 0, 150, 30, 0, 150, 0,
+    ]);
+
+    let mat = new Matrix4();
+    let matrix = mat.translate(new Vector3([0, 50, 0]));
+    matrix = matrix.rotate(Math.PI, Vector3.right)!;
+    for (var ii = 0; ii < positions.length; ii += 3) {
+      const vector = matrix.multiplyVector3(
+        new Vector3([
+          positions[ii + 0],
+          positions[ii + 1],
+          positions[ii + 2],
+          1,
+        ])
+      )!;
+      positions[ii + 0] = vector.x;
+      positions[ii + 1] = vector.y;
+      positions[ii + 2] = vector.z;
+    }
+
+    return positions;
   }
-  initData() {
+  async initData() {
+    const tex = GLTexture.createColorTexture(this.gl, [255, 0, 0, 255]) 
     this.bufferInfo = BufferInfoCreater.createBufferInfoFromArrays(this.gl, {
       a_position: {
         data: new Float32Array(this.setGeometry()),
         numComponents: 3,
       },
-      a_normal: {
+      a_texcoord: {
         data: new Float32Array([
           // left column front
-          0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+          38 / 255, 44 / 255,
+          38 / 255, 223 / 255,
+          113 / 255, 44 / 255,
+          38 / 255, 223 / 255,
+          113 / 255, 223 / 255,
+          113 / 255, 44 / 255,
 
           // top rung front
-          0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+          113 / 255, 44 / 255,
+          113 / 255, 85 / 255,
+          218 / 255, 44 / 255,
+          113 / 255, 85 / 255,
+          218 / 255, 85 / 255,
+          218 / 255, 44 / 255,
 
           // middle rung front
-          0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+          113 / 255, 112 / 255,
+          113 / 255, 151 / 255,
+          203 / 255, 112 / 255,
+          113 / 255, 151 / 255,
+          203 / 255, 151 / 255,
+          203 / 255, 112 / 255,
 
           // left column back
-          0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,
+          38 / 255, 44 / 255,
+          113 / 255, 44 / 255,
+          38 / 255, 223 / 255,
+          38 / 255, 223 / 255,
+          113 / 255, 44 / 255,
+          113 / 255, 223 / 255,
 
           // top rung back
-          0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,
+          113 / 255, 44 / 255,
+          218 / 255, 44 / 255,
+          113 / 255, 85 / 255,
+          113 / 255, 85 / 255,
+          218 / 255, 44 / 255,
+          218 / 255, 85 / 255,
 
           // middle rung back
-          0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,
+          113 / 255, 112 / 255,
+          203 / 255, 112 / 255,
+          113 / 255, 151 / 255,
+          113 / 255, 151 / 255,
+          203 / 255, 112 / 255,
+          203 / 255, 151 / 255,
 
           // top
-          0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
+          0, 0,
+          1, 0,
+          1, 1,
+          0, 0,
+          1, 1,
+          0, 1,
 
           // top rung right
-          1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
+          0, 0,
+          1, 0,
+          1, 1,
+          0, 0,
+          1, 1,
+          0, 1,
 
           // under top rung
-          0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
+          0, 0,
+          0, 1,
+          1, 1,
+          0, 0,
+          1, 1,
+          1, 0,
 
           // between top rung and middle
-          1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
+          0, 0,
+          1, 1,
+          0, 1,
+          0, 0,
+          1, 0,
+          1, 1,
 
           // top of middle rung
-          0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
+          0, 0,
+          1, 1,
+          0, 1,
+          0, 0,
+          1, 0,
+          1, 1,
 
           // right of middle rung
-          1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
+          0, 0,
+          1, 1,
+          0, 1,
+          0, 0,
+          1, 0,
+          1, 1,
 
           // bottom of middle rung.
-          0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
+          0, 0,
+          0, 1,
+          1, 1,
+          0, 0,
+          1, 1,
+          1, 0,
 
           // right of bottom
-          1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
+          0, 0,
+          1, 1,
+          0, 1,
+          0, 0,
+          1, 0,
+          1, 1,
 
           // bottom
-          0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
+          0, 0,
+          0, 1,
+          1, 1,
+          0, 0,
+          1, 1,
+          1, 0,
 
           // left side
-          -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0,
+          0, 0,
+          0, 1,
+          1, 1,
+          0, 0,
+          1, 1,
+          1, 0,
         ]),
-        numComponents: 3,
+        numComponents: 2
       },
     });
-    const light = this.light as PointLight;
     this.uniformsData = {
-      u_worldViewProjection: "",
-      u_worldInverseTranspose: "",
-      u_viewWorldPosition: "",
-      u_world: "",
-      u_color: [0.2, 1, 0.2, 1],
-      u_shininess: light.shininess,
-      u_lightColor: light.color.values,
-      u_specularColor: light.specularColor.values,
-      u_lightWorldPosition: light.position.values,
-    };
+      u_texture: tex
+    }
   }
-  public run(): void {
-    this.initData();
+  public async run(): Promise<void> {
+    await this.initData();
     super.run();
   }
   public render(): void {
@@ -207,26 +283,18 @@ export class TextureApplication extends Application {
       this.matStack.modelViewMatrix
     );
 
-    const worldInverseMatrix = this.matStack.modelViewMatrix.copy().inverse();
-    const worldInverseTransposeMatrix = worldInverseMatrix.copy().transpose();
-
-    this.uniformsData.u_worldInverseTranspose =
-      worldInverseTransposeMatrix.values;
-    this.uniformsData.u_worldViewProjection = worldViewProjectionMatrix.values;
-    this.uniformsData.u_viewWorldPosition = this.camera.position.values;
-    this.uniformsData.u_world = this.matStack.modelViewMatrix.values;
+    this.uniformsData.u_matrix = worldViewProjectionMatrix.values;
 
     this.program.bind();
 
     GLHelper.setBuffersAndAttributes(this.gl, this.program, this.bufferInfo);
     GLHelper.setUniforms(this.program, this.uniformsData);
-    // this.matStack.popMatrix()
-    // Draw the geometry.
+
     const primitiveType = this.gl.TRIANGLES;
     const offset = 0;
     const count = 16 * 6;
     this.gl.drawArrays(primitiveType, offset, count);
-    this.matStack.popMatrix();
+    this.matStack.popMatrix()
   }
 
   public onKeyPress(evt: CanvasKeyBoardEvent): void {

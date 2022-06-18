@@ -405,11 +405,10 @@ function samplerSetter(
   const bindPoint = getBindPointForSamplerType(type);
   return function (textureOrPair: { texture: any; sampler: any }) {
     let texture = textureOrPair;
-   
-    // gl.uniform1i(location, unit);
+    gl.uniform1i(location, unit);
     gl.activeTexture(gl.TEXTURE0 + unit);
     gl.bindTexture(bindPoint, texture);
-    // gl.bindSampler(unit, sampler);
+    // gl.bindSampler(unit, null);
   };
 }
 function getBindPointForSamplerType(type: number) {

@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import { Options, Vue } from "vue-class-component"; 
-import { CameraApplication } from "@/app/CameraApplication";
+import { TextureApplication } from "@/app/TextureApplication";
 import { Camera } from "@/webglUtils/Camera";
 import { PointLight } from "@/webglUtils/Light/PointLight";
 import { Vector3 } from "@/webglUtils/math/TSM";
@@ -14,14 +14,14 @@ import { Vector3 } from "@/webglUtils/math/TSM";
   props: {},
 })
 export default class Sence extends Vue {
-  app: CameraApplication | null = null;
+  app: TextureApplication | null = null;
 
   mounted(): void {
     const canvas = this.$refs.canvas as HTMLCanvasElement;
     this.resizeCanvasToDisplaySize(canvas);
     const camera = new Camera(canvas.width, canvas.height, 45, 0.1, 1000);
     camera.z = 500;
-    const sence = new CameraApplication(canvas, camera);
+    const sence = new TextureApplication(canvas, camera);
     const pointLight = new PointLight(
       new Vector3([0, 0, 100]),
       50,
