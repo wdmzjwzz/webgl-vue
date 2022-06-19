@@ -15,5 +15,8 @@ module.exports = {
             .loader('raw-loader')
             .end()
 
+    },
+    configureWebpack: {
+        devtool: "eval"
     }
 } 
