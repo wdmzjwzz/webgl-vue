@@ -19,8 +19,8 @@ export default class Sence extends Vue {
   mounted(): void {
     const canvas = this.$refs.canvas as HTMLCanvasElement;
     this.resizeCanvasToDisplaySize(canvas);
-    const camera = new Camera(canvas.width, canvas.height, 45, 0.1, 1000);
-    camera.z = 500;
+    const camera = new Camera(canvas.width, canvas.height, 45, 0.1, 100);
+    camera.z = 10;
     const sence = new TextureApplication(canvas, camera);
     const pointLight = new PointLight(
       new Vector3([0, 0, 100]),

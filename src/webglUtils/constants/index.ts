@@ -79,11 +79,134 @@ export enum DataType {
     UNSIGNED_INT_SAMPLER_CUBE = 0x8dd4,
     UNSIGNED_INT_SAMPLER_2D_ARRAY = 0x8dd7,
 
+
+
+    /* PixelFormat */
+    ALPHA = 0x1906,
+    RGB = 0x1907,
+    RGBA = 0x1908,
+    LUMINANCE = 0x1909,
+    LUMINANCE_ALPHA = 0x190A,
+    DEPTH_COMPONENT = 0x1902,
+    DEPTH_STENCIL = 0x84F9,
+
+    /* TextureWrapMode */
+    // REPEAT                         = 0x2901,
+    // MIRRORED_REPEAT                = 0x8370,
+    CLAMP_TO_EDGE = 0x812f,
+
+    /* TextureMagFilter */
+    NEAREST = 0x2600,
+    LINEAR = 0x2601,
+
+    /* TextureMinFilter */
+    // NEAREST_MIPMAP_NEAREST         = 0x2700,
+    // LINEAR_MIPMAP_NEAREST          = 0x2701,
+    // NEAREST_MIPMAP_LINEAR          = 0x2702,
+    // LINEAR_MIPMAP_LINEAR           = 0x2703,
+
+    /* Texture Target */
     TEXTURE_2D = 0x0de1,
     TEXTURE_CUBE_MAP = 0x8513,
     TEXTURE_3D = 0x806f,
     TEXTURE_2D_ARRAY = 0x8c1a,
 
+    /* Cubemap Targets */
+    TEXTURE_CUBE_MAP_POSITIVE_X = 0x8515,
+    TEXTURE_CUBE_MAP_NEGATIVE_X = 0x8516,
+    TEXTURE_CUBE_MAP_POSITIVE_Y = 0x8517,
+    TEXTURE_CUBE_MAP_NEGATIVE_Y = 0x8518,
+    TEXTURE_CUBE_MAP_POSITIVE_Z = 0x8519,
+    TEXTURE_CUBE_MAP_NEGATIVE_Z = 0x851a,
+
+    /* Texture Parameters */
+    TEXTURE_MIN_FILTER = 0x2801,
+    TEXTURE_MAG_FILTER = 0x2800,
+    TEXTURE_WRAP_S = 0x2802,
+    TEXTURE_WRAP_T = 0x2803,
+    TEXTURE_WRAP_R = 0x8072,
+    TEXTURE_MIN_LOD = 0x813a,
+    TEXTURE_MAX_LOD = 0x813b,
+    TEXTURE_BASE_LEVEL = 0x813c,
+    TEXTURE_MAX_LEVEL = 0x813d,
+
+
+    /* Pixel store */
+    UNPACK_ALIGNMENT = 0x0cf5,
+    UNPACK_ROW_LENGTH = 0x0cf2,
+    UNPACK_IMAGE_HEIGHT = 0x806e,
+    UNPACK_SKIP_PIXELS = 0x0cf4,
+    UNPACK_SKIP_ROWS = 0x0cf3,
+    UNPACK_SKIP_IMAGES = 0x806d,
+    UNPACK_COLORSPACE_CONVERSION_WEBGL = 0x9243,
+    UNPACK_PREMULTIPLY_ALPHA_WEBGL = 0x9241,
+    UNPACK_FLIP_Y_WEBGL = 0x9240,
+
+    R8 = 0x8229,
+    R8_SNORM = 0x8F94,
+    R16F = 0x822D,
+    R32F = 0x822E,
+    R8UI = 0x8232,
+    R8I = 0x8231,
+    RG16UI = 0x823A,
+    RG16I = 0x8239,
+    RG32UI = 0x823C,
+    RG32I = 0x823B,
+    RG8 = 0x822B,
+    RG8_SNORM = 0x8F95,
+    RG16F = 0x822F,
+    RG32F = 0x8230,
+    RG8UI = 0x8238,
+    RG8I = 0x8237,
+    R16UI = 0x8234,
+    R16I = 0x8233,
+    R32UI = 0x8236,
+    R32I = 0x8235,
+    RGB8 = 0x8051,
+    SRGB8 = 0x8C41,
+    RGB565 = 0x8D62,
+    RGB8_SNORM = 0x8F96,
+    R11F_G11F_B10F = 0x8C3A,
+    RGB9_E5 = 0x8C3D,
+    RGB16F = 0x881B,
+    RGB32F = 0x8815,
+    RGB8UI = 0x8D7D,
+    RGB8I = 0x8D8F,
+    RGB16UI = 0x8D77,
+    RGB16I = 0x8D89,
+    RGB32UI = 0x8D71,
+    RGB32I = 0x8D83,
+    RGBA8 = 0x8058,
+    SRGB8_ALPHA8 = 0x8C43,
+    RGBA8_SNORM = 0x8F97,
+    RGB5_A1 = 0x8057,
+    RGBA4 = 0x8056,
+    RGB10_A2 = 0x8059,
+    RGBA16F = 0x881A,
+    RGBA32F = 0x8814,
+    RGBA8UI = 0x8D7C,
+    RGBA8I = 0x8D8E,
+    RGB10_A2UI = 0x906F,
+    RGBA16UI = 0x8D76,
+    RGBA16I = 0x8D88,
+    RGBA32I = 0x8D82,
+    RGBA32UI = 0x8D70,
+
+    DEPTH_COMPONENT16 = 0x81A5,
+    DEPTH_COMPONENT24 = 0x81A6,
+    DEPTH_COMPONENT32F = 0x8CAC,
+    DEPTH32F_STENCIL8 = 0x8CAD,
+    DEPTH24_STENCIL8 = 0x88F0,
+
+    RG = 0x8227,
+    RG_INTEGER = 0x8228,
+    RED = 0x1903,
+    RED_INTEGER = 0x8D94,
+    RGB_INTEGER = 0x8D98,
+    RGBA_INTEGER = 0x8D99,
+
+    /* DataType */ 
+    HALF_FLOAT_OES = 0x8D61,  
 }
 export const glTypeToTypedArray: { [key: number]: any } =
 {

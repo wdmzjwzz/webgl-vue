@@ -234,9 +234,7 @@ export class GLHelper {
     programInfo: GLProgram,
     buffers: any
   ) {
-    // if (this.vao) {
-    //   gl.bindVertexArray(this.vao);
-    // }
+   
     this.setAttributes(programInfo.attribSetters, buffers.attribs);
     if (buffers.indices) {
       gl.bindBuffer(DataType.ELEMENT_ARRAY_BUFFER, buffers.indices);

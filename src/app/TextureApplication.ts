@@ -51,214 +51,25 @@ export class TextureApplication extends Application {
   public update(elapsedMsec: number, intervalSec: number): void {
     this.camera.update(intervalSec);
   }
-  setGeometry() {
-    var positions = new Float32Array([
-      // left column front
-      0, 0, 0, 0, 150, 0, 30, 0, 0, 0, 150, 0, 30, 150, 0, 30, 0, 0,
 
-      // top rung front
-      30, 0, 0, 30, 30, 0, 100, 0, 0, 30, 30, 0, 100, 30, 0, 100, 0, 0,
-
-      // middle rung front
-      30, 60, 0, 30, 90, 0, 67, 60, 0, 30, 90, 0, 67, 90, 0, 67, 60, 0,
-
-      // left column back
-      0, 0, 30, 30, 0, 30, 0, 150, 30, 0, 150, 30, 30, 0, 30, 30, 150, 30,
-
-      // top rung back
-      30, 0, 30, 100, 0, 30, 30, 30, 30, 30, 30, 30, 100, 0, 30, 100, 30, 30,
-
-      // middle rung back
-      30, 60, 30, 67, 60, 30, 30, 90, 30, 30, 90, 30, 67, 60, 30, 67, 90, 30,
-
-      // top
-      0, 0, 0, 100, 0, 0, 100, 0, 30, 0, 0, 0, 100, 0, 30, 0, 0, 30,
-
-      // top rung right
-      100, 0, 0, 100, 30, 0, 100, 30, 30, 100, 0, 0, 100, 30, 30, 100, 0, 30,
-
-      // under top rung
-      30, 30, 0, 30, 30, 30, 100, 30, 30, 30, 30, 0, 100, 30, 30, 100, 30, 0,
-
-      // between top rung and middle
-      30, 30, 0, 30, 60, 30, 30, 30, 30, 30, 30, 0, 30, 60, 0, 30, 60, 30,
-
-      // top of middle rung
-      30, 60, 0, 67, 60, 30, 30, 60, 30, 30, 60, 0, 67, 60, 0, 67, 60, 30,
-
-      // right of middle rung
-      67, 60, 0, 67, 90, 30, 67, 60, 30, 67, 60, 0, 67, 90, 0, 67, 90, 30,
-
-      // bottom of middle rung.
-      30, 90, 0, 30, 90, 30, 67, 90, 30, 30, 90, 0, 67, 90, 30, 67, 90, 0,
-
-      // right of bottom
-      30, 90, 0, 30, 150, 30, 30, 90, 30, 30, 90, 0, 30, 150, 0, 30, 150, 30,
-
-      // bottom
-      0, 150, 0, 0, 150, 30, 30, 150, 30, 0, 150, 0, 30, 150, 30, 30, 150, 0,
-
-      // left side
-      0, 0, 0, 0, 0, 30, 0, 150, 30, 0, 0, 0, 0, 150, 30, 0, 150, 0,
-    ]);
-
-    let mat = new Matrix4();
-    let matrix = mat.translate(new Vector3([0, 50, 0]));
-    matrix = matrix.rotate(Math.PI, Vector3.right)!;
-    for (var ii = 0; ii < positions.length; ii += 3) {
-      const vector = matrix.multiplyVector3(
-        new Vector3([
-          positions[ii + 0],
-          positions[ii + 1],
-          positions[ii + 2],
-          1,
-        ])
-      )!;
-      positions[ii + 0] = vector.x;
-      positions[ii + 1] = vector.y;
-      positions[ii + 2] = vector.z;
-    }
-
-    return positions;
-  }
   async initData() {
-    const tex = GLTexture.createColorTexture(this.gl, [255, 0, 0, 255]) 
+    const tex = GLTexture.createColorTexture(this.gl, [192, 192, 192, 255,])
+
     this.bufferInfo = BufferInfoCreater.createBufferInfoFromArrays(this.gl, {
       a_position: {
-        data: new Float32Array(this.setGeometry()),
+        data: new Float32Array([1, 1, -1, 1, 1, 1, 1, -1, 1, 1, -1, -1, -1, 1, 1, -1, 1, -1, -1, -1, -1, -1, -1, 1, -1, 1, 1, 1, 1, 1, 1, 1, -1, -1, 1, -1, -1, -1, -1, 1, -1, -1, 1, -1, 1, -1, -1, 1, 1, 1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1, -1, 1, -1, 1, 1, -1, 1, -1, -1, -1, -1, -1]),
         numComponents: 3,
       },
+      normal: {
+        data: new Float32Array([1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1]),
+        numComponents: 3
+      },
       a_texcoord: {
-        data: new Float32Array([
-          // left column front
-          38 / 255, 44 / 255,
-          38 / 255, 223 / 255,
-          113 / 255, 44 / 255,
-          38 / 255, 223 / 255,
-          113 / 255, 223 / 255,
-          113 / 255, 44 / 255,
-
-          // top rung front
-          113 / 255, 44 / 255,
-          113 / 255, 85 / 255,
-          218 / 255, 44 / 255,
-          113 / 255, 85 / 255,
-          218 / 255, 85 / 255,
-          218 / 255, 44 / 255,
-
-          // middle rung front
-          113 / 255, 112 / 255,
-          113 / 255, 151 / 255,
-          203 / 255, 112 / 255,
-          113 / 255, 151 / 255,
-          203 / 255, 151 / 255,
-          203 / 255, 112 / 255,
-
-          // left column back
-          38 / 255, 44 / 255,
-          113 / 255, 44 / 255,
-          38 / 255, 223 / 255,
-          38 / 255, 223 / 255,
-          113 / 255, 44 / 255,
-          113 / 255, 223 / 255,
-
-          // top rung back
-          113 / 255, 44 / 255,
-          218 / 255, 44 / 255,
-          113 / 255, 85 / 255,
-          113 / 255, 85 / 255,
-          218 / 255, 44 / 255,
-          218 / 255, 85 / 255,
-
-          // middle rung back
-          113 / 255, 112 / 255,
-          203 / 255, 112 / 255,
-          113 / 255, 151 / 255,
-          113 / 255, 151 / 255,
-          203 / 255, 112 / 255,
-          203 / 255, 151 / 255,
-
-          // top
-          0, 0,
-          1, 0,
-          1, 1,
-          0, 0,
-          1, 1,
-          0, 1,
-
-          // top rung right
-          0, 0,
-          1, 0,
-          1, 1,
-          0, 0,
-          1, 1,
-          0, 1,
-
-          // under top rung
-          0, 0,
-          0, 1,
-          1, 1,
-          0, 0,
-          1, 1,
-          1, 0,
-
-          // between top rung and middle
-          0, 0,
-          1, 1,
-          0, 1,
-          0, 0,
-          1, 0,
-          1, 1,
-
-          // top of middle rung
-          0, 0,
-          1, 1,
-          0, 1,
-          0, 0,
-          1, 0,
-          1, 1,
-
-          // right of middle rung
-          0, 0,
-          1, 1,
-          0, 1,
-          0, 0,
-          1, 0,
-          1, 1,
-
-          // bottom of middle rung.
-          0, 0,
-          0, 1,
-          1, 1,
-          0, 0,
-          1, 1,
-          1, 0,
-
-          // right of bottom
-          0, 0,
-          1, 1,
-          0, 1,
-          0, 0,
-          1, 0,
-          1, 1,
-
-          // bottom
-          0, 0,
-          0, 1,
-          1, 1,
-          0, 0,
-          1, 1,
-          1, 0,
-
-          // left side
-          0, 0,
-          0, 1,
-          1, 1,
-          0, 0,
-          1, 1,
-          1, 0,
-        ]),
+        data: new Float32Array([1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1]),
         numComponents: 2
+      },
+      indices: {
+        data: new Uint16Array([0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23]),
       },
     });
     this.uniformsData = {
@@ -288,12 +99,9 @@ export class TextureApplication extends Application {
     this.program.bind();
 
     GLHelper.setBuffersAndAttributes(this.gl, this.program, this.bufferInfo);
-    GLHelper.setUniforms(this.program, this.uniformsData);
+    GLHelper.setUniforms(this.program, this.uniformsData); 
 
-    const primitiveType = this.gl.TRIANGLES;
-    const offset = 0;
-    const count = 16 * 6;
-    this.gl.drawArrays(primitiveType, offset, count);
+    this.gl.drawElements(this.gl.TRIANGLES, this.bufferInfo!.numElements!, this.gl.UNSIGNED_SHORT, 0);
     this.matStack.popMatrix()
   }
 
