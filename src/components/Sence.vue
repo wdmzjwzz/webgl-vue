@@ -5,12 +5,11 @@
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import { GLProgram } from "@/webglUtils/GLProgram";
-import { CameraApplication } from "@/webglUtils/CameraApplication";
-import { Camera } from "@/webglUtils/Camera";
-import { PointLight } from "@/webglUtils/Light/PointLight";
-import { Vector3 } from "@/webglUtils/math/TSM";
+import { Options, Vue } from "vue-class-component"; 
+import { CameraApplication } from "@/app/CameraApplication";
+import { Camera } from "@/app/Camera";
+import { PointLight } from "@/app/Light/PointLight";
+import { Vector3 } from "@/app/math/TSM";
 @Options({
   props: {},
 })
