@@ -66,9 +66,7 @@ export class SenceApplication extends Application {
     }
     public start(): void {
         super.start()
-        setDefaults({ attribPrefix: "a_" });
-
-        this.matStack.pushMatrix()
+        setDefaults({ attribPrefix: "a_" }); 
         const uniforms: any = {
             u_lightWorldPos: this.light?.position,
             u_lightColor: this.light?.color,
