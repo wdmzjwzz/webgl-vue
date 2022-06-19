@@ -358,9 +358,9 @@ export class CameraApplication extends Application {
     }
     render();
   }
-  public run(): void {
+  public start(): void {
     this.initData();
-    super.run();
+    super.start();
   }
   public render(): void {
 

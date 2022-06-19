@@ -178,7 +178,7 @@ export class Application implements EventListenerObject {
   }
 
   // 启动动画循环
-  private start(): void {
+  public start(): void {
     if (this._start === false) {
       this._start = true;
       //this . _requestId = -1 ; // 将_requestId设置为-1
@@ -258,10 +258,7 @@ export class Application implements EventListenerObject {
   //虚方法，子类能覆写（override），用于渲染
   public render(): void {}
 
-  // 虚函数，子类覆写（overide），用于同步各种资源后启动Application
-  public run() {
-    this.start();
-  }
+ 
   public clearCanvas() {}
   // 调用dispatchXXXX虚方法进行事件分发
   // handleEvent是接口EventListenerObject定义的协议分发，必须要实现

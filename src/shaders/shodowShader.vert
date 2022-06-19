@@ -1,28 +1,24 @@
-#version 300 es
-in vec4 a_position;
-in vec2 a_texcoord;
-in vec3 a_normal;
-
-uniform mat4 u_projection;
-uniform mat4 u_view;
+uniform mat4 u_worldViewProjection;
+uniform vec3 u_lightWorldPos;
 uniform mat4 u_world;
-uniform mat4 u_textureMatrix;
+uniform mat4 u_viewInverse;
+uniform mat4 u_worldInverseTranspose;
 
-out vec2 v_texcoord;
-out vec4 v_projectedTexcoord;
-out vec3 v_normal;
+attribute vec4 a_position;
+attribute vec3 a_normal;
+attribute vec2 a_texcoord;
+
+varying vec4 v_position;
+varying vec2 v_texCoord;
+varying vec3 v_normal;
+varying vec3 v_surfaceToLight;
+varying vec3 v_surfaceToView;
 
 void main() {
-  // Multiply the position by the matrix.
-  vec4 worldPosition = u_world * a_position;
-
-  gl_Position = u_projection * u_view * worldPosition;
-
-  // Pass the texture coord to the fragment shader.
-  v_texcoord = a_texcoord;
-
-  v_projectedTexcoord = u_textureMatrix * worldPosition;
-
-  // orient the normals and pass to the fragment shader
-  v_normal = mat3(u_world) * a_normal;
+  v_texCoord = a_texcoord;
+  v_position = (u_worldViewProjection * a_position);
+  v_normal = (u_worldInverseTranspose * vec4(a_normal, 0)).xyz;
+  v_surfaceToLight = u_lightWorldPos - (u_world * a_position).xyz;
+  v_surfaceToView = (u_viewInverse[3] - (u_world * a_position)).xyz;
+  gl_Position = v_position;
 }

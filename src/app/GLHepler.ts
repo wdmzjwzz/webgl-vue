@@ -1,8 +1,4 @@
-import { DataType } from "./constants";
-import { AttrSetterMap } from "./constants/AttrSetterMap";
-import { UniformSettersMap } from "./constants/UniformSettersMap";
-import { GLProgram, GLSetters } from "./GLProgram";
-
+ 
 export enum EGLSLESDataType {
   FLOAT_Vector2 = 0x8b50,
   FLOAT_Vector3,
@@ -170,90 +166,6 @@ export class GLHelper {
     }
   }
 
-  public static getAttribsSetters(
-    gl: WebGL2RenderingContext,
-    program: WebGLProgram
-  ) {
-    const attributsCount: number = gl.getProgramParameter(
-      program,
-      gl.ACTIVE_ATTRIBUTES
-    );
-    const attribSetters: any = {};
-    for (let i = 0; i < attributsCount; ++i) {
-      const attribInfo = gl.getActiveAttrib(program, i);
-      if (!attribInfo) {
-        continue;
-      }
-      const index = gl.getAttribLocation(program, attribInfo.name);
-      const typeInfo = AttrSetterMap[attribInfo.type];
-      const setter = typeInfo.setter(gl, index, typeInfo);
-      setter.location = index;
-      attribSetters[attribInfo.name] = setter;
-    }
-    return attribSetters;
-  }
-
-  public static getUniformsSetters(
-    gl: WebGL2RenderingContext,
-    program: WebGLProgram
-  ) {
-    const uniformSetters: any = {};
-    const numUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
-
-    for (let ii = 0; ii < numUniforms; ++ii) {
-      const uniformInfo = gl.getActiveUniform(program, ii);
-      if (!uniformInfo) {
-        continue;
-      }
-      let name = uniformInfo.name;
-      const location = gl.getUniformLocation(program, name);
-
-      if (!location) {
-        continue;
-      }
-      let setter;
-      const type = uniformInfo.type;
-      const typeInfo = UniformSettersMap[type];
-      console.log(name, typeInfo, type);
-
-      if (!typeInfo) {
-        throw new Error(`unknown type: 0x${type.toString(16)}`); // we should never get here.
-      }
-      setter = typeInfo.setter(gl, location);
-      setter.location = location;
-      uniformSetters[name] = setter;
-    }
-    return uniformSetters;
-  }
-  public static setBuffersAndAttributes(
-    gl: WebGL2RenderingContext,
-    programInfo: GLProgram,
-    buffers: any
-  ) {
-    // if (this.vao) {
-    //   gl.bindVertexArray(this.vao);
-    // }
-    this.setAttributes(programInfo.attribSetters, buffers.attribs);
-    if (buffers.indices) {
-      gl.bindBuffer(DataType.ELEMENT_ARRAY_BUFFER, buffers.indices);
-    }
-  }
-  public static setAttributes(setters: GLSetters, buffers: any) {
-    for (const name in buffers) {
-      const setter = setters[name];
-      if (setter) {
-        setter(buffers[name]);
-      }
-    }
-  }
-  public static setUniforms(programInfo: GLProgram, uniforms: any) {
-    for (const name in uniforms) {
-      const setter = programInfo.uniformSetters[name];
-      if (setter) {
-        setter(uniforms[name]);
-      }
-    }
-  }
   public static getColorBufferData(gl: WebGL2RenderingContext): Uint8Array {
     const pixels: Uint8Array = new Uint8Array(
       gl.drawingBufferWidth * gl.drawingBufferHeight * 4

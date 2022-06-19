@@ -5,31 +5,34 @@
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component"; 
-import { CameraApplication } from "@/app/CameraApplication";
+import { Options, Vue } from "vue-class-component";
+import { SenceApplication } from "@/app/SenceApplication";
 import { Camera } from "@/app/Camera";
 import { PointLight } from "@/app/Light/PointLight";
 import { Vector3 } from "@/app/math/TSM";
+import { PlaneEntity } from "@/app/Entity/PlaneEntity";
 @Options({
   props: {},
 })
 export default class Sence extends Vue {
-  app: CameraApplication | null = null;
+  app: Sence | null = null;
 
   mounted(): void {
     const canvas = this.$refs.canvas as HTMLCanvasElement;
     this.resizeCanvasToDisplaySize(canvas);
-    const camera = new Camera(canvas.width, canvas.height, 45, 0.1, 1000);
-    camera.z = 500;
-    const sence = new CameraApplication(canvas, camera);
+    const camera = new Camera(canvas.width, canvas.height, 45, 0.1, 100);
     const pointLight = new PointLight(
-      new Vector3([200, 300, 400]),
+      [1, 8, 10],
       50,
-      new Vector3([1, 0.2, 0.2]),
-      new Vector3([1, 0.6, 0.6])
+      [1, 1, 1, 1],
+      [1, 1, 1, 1]
     );
+    const plane = new PlaneEntity(20, 20);
+    const sence = new SenceApplication(canvas);
+    sence.addCamera(camera);
     sence.addLight(pointLight);
-    sence.run();
+    sence.addEntity(plane);
+    sence.start();
   }
 
   resizeCanvasToDisplaySize(canvas: HTMLCanvasElement): boolean {
