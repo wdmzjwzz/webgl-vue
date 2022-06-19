@@ -9,7 +9,7 @@ import { GeometryEntity } from "./Entity/GeometryEntity";
 import { GLTexture } from "./GLTexture";
 import { PointLight } from "./Light/PointLight";
 import { GLWorldMatrixStack } from "./GLMatrixStack";
-import { Matrix4 } from "./math/TSM";
+import { Matrix4, Vector3 } from "./math/TSM";
 export class SenceApplication extends Application {
     public entities: GeometryEntity[] = [];
     public light: PointLight | null = null
@@ -102,25 +102,12 @@ export class SenceApplication extends Application {
             u_worldInverseTranspose: [],
             u_worldViewProjection: [],
         };
-        const projection = m4.perspective(30 * Math.PI / 180, this.canvas.clientWidth / this.canvas.clientHeight, 0.5, 100);
-        const eye = [0, 0, 30];
-        const target = [0, 0, 0];
-        const up = [0, 1, 0];
-        const camera = m4.lookAt(eye, target, up);;
-        const view = m4.inverse(camera);
-        const viewProjection = m4.multiply(projection, view)
-
-
-
-        const world = uniforms.u_world;
-        m4.identity(world);
-        m4.rotateY(world, 0, world);
-        m4.rotateZ(world, 0, world);
-        m4.translate(world, [0, 0, 0], world);
-        m4.rotateX(world, Math.PI / 2, world);
-        m4.transpose(m4.inverse(world, uniforms.u_worldInverseTranspose), uniforms.u_worldInverseTranspose);
-        m4.multiply(viewProjection, uniforms.u_world, uniforms.u_worldViewProjection);
-        uniforms.u_viewInverse = view
+ 
+        this.matStack.rotate(-90, Vector3.right) 
+        uniforms.u_world = this.matStack.modelViewMatrix.values
+        uniforms.u_worldInverseTranspose = m4.transpose(m4.inverse(uniforms.u_world));
+        uniforms.u_worldViewProjection = m4.multiply(this.camera!.viewProjection, this.matStack.modelViewMatrix.values);
+        uniforms.u_viewInverse = this.camera?.viewMat4
 
         this.entities.forEach(entity => {
             entity.addTexture(new GLTexture(tex))
