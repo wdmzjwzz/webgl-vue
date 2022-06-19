@@ -3,19 +3,14 @@ import { GLTexture } from "../GLTexture";
 import { BaseEntity } from "./BaseEntity";
 
 export class GeometryEntity extends BaseEntity {
-    public textures: GLTexture[]
-    public transform: m4.Mat4 | undefined;
+    public texture: GLTexture | undefined
+    public transform: m4.Mat4 = m4.identity();
     public vertices: any;
-    constructor(texture: GLTexture[] = []) {
+    constructor(texture?: GLTexture) {
         super()
-        this.textures = texture
+        this.texture = texture
     }
-    addTexture(tex: GLTexture) {
-        const hasTex = this.textures.find(item => item.id === tex.id)
-        if (hasTex) {
-            console.warn('texture不能重复添加!')
-            return
-        }
-        this.textures.push(tex)
+    setTexture(tex: GLTexture) {
+        this.texture = tex
     }
 }

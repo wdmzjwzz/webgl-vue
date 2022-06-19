@@ -67,28 +67,8 @@ export class SenceApplication extends Application {
     public start(): void {
         super.start()
         setDefaults({ attribPrefix: "a_" });
-        const tex = GLUtils.createTexture(this.gl, {
-            mag: this.gl.NEAREST,
-            min: this.gl.LINEAR,
-            target: this.gl.TEXTURE_2D,
-            format: this.gl.LUMINANCE,
-            width: 8,
-            height: 8,
-            src: [
-                0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC,
-                0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF,
-                0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC,
-                0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF,
-                0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC,
-                0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF,
-                0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC,
-                0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF, 0xCC, 0xFF,
-            ],
-        });
 
         this.matStack.pushMatrix()
-
-
         const uniforms: any = {
             u_lightWorldPos: this.light?.position,
             u_lightColor: this.light?.color,
@@ -96,41 +76,38 @@ export class SenceApplication extends Application {
             u_specular: this.light?.specularColor,
             u_shininess: 50,
             u_specularFactor: 1,
-            u_diffuse: tex,
+            u_diffuse: '',
             u_viewInverse: [],
             u_world: [],
             u_worldInverseTranspose: [],
             u_worldViewProjection: [],
         };
- 
-        this.matStack.rotate(-90, Vector3.right) 
-        uniforms.u_world = this.matStack.modelViewMatrix.values
-        uniforms.u_worldInverseTranspose = m4.transpose(m4.inverse(uniforms.u_world));
-        uniforms.u_worldViewProjection = m4.multiply(this.camera!.viewProjection, this.matStack.modelViewMatrix.values);
-        uniforms.u_viewInverse = this.camera?.viewMat4
 
         this.entities.forEach(entity => {
-            entity.addTexture(new GLTexture(tex))
+            const tex = GLUtils.createTexture(this.gl, entity.texture!.textureOptions);
+            entity.transform = m4.rotateX(entity.transform, Math.PI / 2)
+            uniforms.u_diffuse = tex
+            uniforms.u_world = entity.transform
+            uniforms.u_worldInverseTranspose = m4.transpose(m4.inverse(uniforms.u_world));
+            uniforms.u_worldViewProjection = m4.multiply(this.camera!.viewProjection, entity.transform);
+            uniforms.u_viewInverse = this.camera?.viewMat4
             const vertices = entity.vertices;
             const bufferInfo = GLUtils.createBufferInfoFromVertices(this.gl, vertices);
             this.drawObjects.push({
                 programInfo: this.programInfo,
                 bufferInfo: bufferInfo,
-                uniforms: uniforms,
+                uniforms: { ...uniforms },
             });
 
         })
-        resizeCanvasToDisplaySize(this.canvas);
-        this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
 
-        this.gl.enable(this.gl.DEPTH_TEST);
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-
-
-        drawObjectList(this.gl, this.drawObjects);
     }
     render() {
-
+        resizeCanvasToDisplaySize(this.canvas);
+        this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+        this.gl.enable(this.gl.DEPTH_TEST);
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+        drawObjectList(this.gl, this.drawObjects);
     }
     destroy() {
         this.gl.bindVertexArray(null)
