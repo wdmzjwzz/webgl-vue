@@ -26,8 +26,8 @@ export default class Sence extends Vue {
     const camera = new Camera(canvas.width, canvas.height, 45, 0.1, 1000);
 
     const pointLight = new PointLight(
-      [0, 0, 20],
-      50,
+      [0, 10, 200],
+      5,
       [1, 1, 1, 1],
       [1, 1, 1, 1]
     );

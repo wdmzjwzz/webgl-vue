@@ -12,11 +12,9 @@ import {
   resizeCanvasToDisplaySize,
   setDefaults,
 } from "twgl.js";
-import { GeometryEntity } from "./Entity/GeometryEntity";
-import { GLTexture } from "./GLTexture";
+import { GeometryEntity } from "./Entity/GeometryEntity"; 
 import { PointLight } from "./Light/PointLight";
-import { GLWorldMatrixStack } from "./GLMatrixStack";
-import { Matrix4, Vector3 } from "./math/TSM";
+import { GLWorldMatrixStack } from "./GLMatrixStack"; 
 export class SenceApplication extends Application {
   public entities: GeometryEntity[] = [];
   public light: PointLight | null = null;
@@ -84,7 +82,7 @@ export class SenceApplication extends Application {
       u_lightColor: this.light?.color,
       u_diffuseMult: [0.4, 0.5, 0.8, 1],
       u_specular: this.light?.specularColor,
-      u_shininess: 50,
+      u_shininess: this.light?.shininess,
       u_specularFactor: 1,
       u_diffuse: "",
       u_viewInverse: [],
