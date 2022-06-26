@@ -51,7 +51,14 @@ export class CameraApplication extends Application {
 
   }
 
+  resizeCanvasToDisplaySize() {
+    const canvas = this.gl.canvas as HTMLCanvasElement; 
+    if (canvas.width !== canvas.clientWidth) {
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
+    }
 
+  };
   public start(): void {
     const { vertexes, normals } = GLHelper.createFVertxes()
     const bufferData: {
@@ -75,16 +82,16 @@ export class CameraApplication extends Application {
       }
     }
     // and make it the one we're currently working with
-    this.gl.bindVertexArray(this.vao);
+ 
     this.glProgram.setBufferInfo(bufferData)
     this.glProgram.bind()
     super.start();
   }
   public render(): void {
+    this.resizeCanvasToDisplaySize()
     GLHelper.setDefaultState(this.gl);
     // Compute the matrix
-    this.angle += 0.1
-
+    // this.angle += 0.1 
 
     const viewProjectionMatrix = this.camera.viewProjection
 
