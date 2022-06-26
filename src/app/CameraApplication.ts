@@ -52,15 +52,14 @@ export class CameraApplication extends Application {
   }
 
   resizeCanvasToDisplaySize() {
-    const canvas = this.gl.canvas as HTMLCanvasElement; 
+    const canvas = this.gl.canvas as HTMLCanvasElement;
     if (canvas.width !== canvas.clientWidth) {
       canvas.width = canvas.clientWidth;
       canvas.height = canvas.clientHeight;
     }
-
   };
   public start(): void {
-    const { vertexes, normals } = GLHelper.createFVertxes()
+    const { vertexes, colors ,indices} = GLHelper.createFVertxes()
     const bufferData: {
       [key: string]: BufferData
     } = {
@@ -72,8 +71,16 @@ export class CameraApplication extends Application {
         offset: 0,
         normalize: false
       },
-      a_normal: {
-        data: normals,
+      a_color: {
+        data: colors,
+        size: 3,
+        type: this.gl.FLOAT,
+        stride: 0,
+        offset: 0,
+        normalize: false
+      },
+      indices: {
+        data: indices,
         size: 3,
         type: this.gl.FLOAT,
         stride: 0,
@@ -82,7 +89,7 @@ export class CameraApplication extends Application {
       }
     }
     // and make it the one we're currently working with
- 
+
     this.glProgram.setBufferInfo(bufferData)
     this.glProgram.bind()
     super.start();
@@ -101,20 +108,21 @@ export class CameraApplication extends Application {
 
     const worldMatrix = this.matStack.modelViewMatrix;
     const worldViewProjectionMatrix = Matrix4.product(viewProjectionMatrix, worldMatrix);
-    worldMatrix.inverse();
-    worldMatrix.transpose();
+    const newWorldMat4 = worldMatrix.copy()
+    newWorldMat4.inverse();
+    newWorldMat4.transpose();
 
     const uniformInfo = {
       u_worldViewProjection: worldViewProjectionMatrix.values,
-      u_worldInverseTranspose: worldMatrix.values,
+      u_worldInverseTranspose: newWorldMat4.values,
       u_color: [0.2, 1, 0.2, 1],
-      u_reverseLightDirection: new Vector3([0.2, 1, 0.2, 1]).normalize().values
+      // u_reverseLightDirection: new Vector3([0.2, 1, 0.2, 1]).normalize().values
     }
     this.glProgram.setUniformInfo(uniformInfo)
     // Draw the geometry.
     const primitiveType = this.gl.TRIANGLES;
     const offset = 0;
-    const count = 16 * 6;
+    const count = 6 * 6;
     this.gl.drawArrays(primitiveType, offset, count);
     this.matStack.popMatrix()
   }

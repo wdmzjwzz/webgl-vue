@@ -11,7 +11,7 @@ export interface GLParamsInfo {
     name: string;
 }
 export interface BufferData {
-    data: Float32Array;
+    data: Float32Array | Uint16Array;
     size: number;
     type: GLenum;
     stride?: number;
@@ -41,8 +41,8 @@ export default class GLProgram {
 
         this.vsShader = this.createShader(this.gl.VERTEX_SHADER);
 
-        this.fsShader = this.createShader(this.gl.FRAGMENT_SHADER); 
-        
+        this.fsShader = this.createShader(this.gl.FRAGMENT_SHADER);
+
         this.loadShaders(vsShader, fsShader);
 
         this.program = this.createProgram();
@@ -160,15 +160,20 @@ export default class GLProgram {
     }
 
     public setBufferInfo(bufferData: { [key: string]: BufferData }) {
-        const keys = Object.keys(this.atrributeInfoMap);
+        const keys = Object.keys(bufferData);
         keys.forEach((key) => {
             const { data, size, type, stride, offset, normalize } = bufferData[key];
+            if (key === 'indices') {
+                const indexBuffer = this.gl.createBuffer();
+                this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+                this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, data, this.gl.STATIC_DRAW);
+                return
+            }
 
             const localtion = this.atrributeInfoMap[key].localtion as number;
-            const normalBuffer = this.gl.createBuffer();
-            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, normalBuffer);
+            const buffer = this.gl.createBuffer();
+            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
             this.gl.bufferData(this.gl.ARRAY_BUFFER, data, this.gl.STATIC_DRAW);
-
             // Turn on the attribute
             this.gl.enableVertexAttribArray(localtion);
             this.gl.vertexAttribPointer(

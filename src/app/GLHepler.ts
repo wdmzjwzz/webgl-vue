@@ -87,7 +87,7 @@ export class GLHelper {
 
   public static setDefaultState(gl: WebGL2RenderingContext): void {
     // default [r=0,g=0,b=0,a=0] 
-    const canvas = (gl.canvas as HTMLCanvasElement) 
+    const canvas = (gl.canvas as HTMLCanvasElement)
 
     gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
     gl.clearColor(0.0, 0.0, 0.0, 0.0); // 每次清屏时，将颜色缓冲区设置为全透明黑色
@@ -95,7 +95,7 @@ export class GLHelper {
     // turn on depth testing
     gl.enable(gl.DEPTH_TEST);
     // tell webgl to cull faces
-    gl.enable(gl.CULL_FACE);
+    // gl.enable(gl.CULL_FACE);
   }
   public static getColorBufferData(gl: WebGL2RenderingContext): Uint8Array {
     const pixels: Uint8Array = new Uint8Array(
@@ -115,115 +115,58 @@ export class GLHelper {
 
   public static createFVertxes() {
     const vertexes = new Float32Array([
-      // left column front
-      0, 0, 0, 0, 150, 0, 30, 0, 0, 0, 150, 0, 30, 150, 0, 30, 0, 0,
+      // Front face
+      -1.0, -1.0, 1.0,
+      1.0, -1.0, 1.0,
+      1.0, 1.0, 1.0,
+      -1.0, 1.0, 1.0,
 
-      // top rung front
-      30, 0, 0, 30, 30, 0, 100, 0, 0, 30, 30, 0, 100, 30, 0, 100, 0, 0,
+      // Back face
+      -1.0, -1.0, -1.0,
+      -1.0, 1.0, -1.0,
+      1.0, 1.0, -1.0,
+      1.0, -1.0, -1.0,
 
-      // middle rung front
-      30, 60, 0, 30, 90, 0, 67, 60, 0, 30, 90, 0, 67, 90, 0, 67, 60, 0,
+      // Top face
+      -1.0, 1.0, -1.0,
+      -1.0, 1.0, 1.0,
+      1.0, 1.0, 1.0,
+      1.0, 1.0, -1.0,
 
-      // left column back
-      0, 0, 30, 30, 0, 30, 0, 150, 30, 0, 150, 30, 30, 0, 30, 30, 150, 30,
+      // Bottom face
+      -1.0, -1.0, -1.0,
+      1.0, -1.0, -1.0,
+      1.0, -1.0, 1.0,
+      -1.0, -1.0, 1.0,
 
-      // top rung back
-      30, 0, 30, 100, 0, 30, 30, 30, 30, 30, 30, 30, 100, 0, 30, 100, 30, 30,
+      // Right face
+      1.0, -1.0, -1.0,
+      1.0, 1.0, -1.0,
+      1.0, 1.0, 1.0,
+      1.0, -1.0, 1.0,
 
-      // middle rung back
-      30, 60, 30, 67, 60, 30, 30, 90, 30, 30, 90, 30, 67, 60, 30, 67, 90, 30,
-
-      // top
-      0, 0, 0, 100, 0, 0, 100, 0, 30, 0, 0, 0, 100, 0, 30, 0, 0, 30,
-
-      // top rung right
-      100, 0, 0, 100, 30, 0, 100, 30, 30, 100, 0, 0, 100, 30, 30, 100, 0, 30,
-
-      // under top rung
-      30, 30, 0, 30, 30, 30, 100, 30, 30, 30, 30, 0, 100, 30, 30, 100, 30, 0,
-
-      // between top rung and middle
-      30, 30, 0, 30, 60, 30, 30, 30, 30, 30, 30, 0, 30, 60, 0, 30, 60, 30,
-
-      // top of middle rung
-      30, 60, 0, 67, 60, 30, 30, 60, 30, 30, 60, 0, 67, 60, 0, 67, 60, 30,
-
-      // right of middle rung
-      67, 60, 0, 67, 90, 30, 67, 60, 30, 67, 60, 0, 67, 90, 0, 67, 90, 30,
-
-      // bottom of middle rung.
-      30, 90, 0, 30, 90, 30, 67, 90, 30, 30, 90, 0, 67, 90, 30, 67, 90, 0,
-
-      // right of bottom
-      30, 90, 0, 30, 150, 30, 30, 90, 30, 30, 90, 0, 30, 150, 0, 30, 150, 30,
-
-      // bottom
-      0, 150, 0, 0, 150, 30, 30, 150, 30, 0, 150, 0, 30, 150, 30, 30, 150, 0,
-
-      // left side
-      0, 0, 0, 0, 0, 30, 0, 150, 30, 0, 0, 0, 0, 150, 30, 0, 150, 0,
+      // Left face
+      -1.0, -1.0, -1.0,
+      -1.0, -1.0, 1.0,
+      -1.0, 1.0, 1.0,
+      -1.0, 1.0, -1.0,
     ]);
-    const normals = new Float32Array([
-      // left column front
-      0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-
-      // top rung front
-      0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-
-      // middle rung front
-      0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-
-      // left column back
-      0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,
-
-      // top rung back
-      0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,
-
-      // middle rung back
-      0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,
-
-      // top
-      0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
-
-      // top rung right
-      1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
-
-      // under top rung
-      0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
-
-      // between top rung and middle
-      1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
-
-      // top of middle rung
-      0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
-
-      // right of middle rung
-      1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
-
-      // bottom of middle rung.
-      0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
-
-      // right of bottom
-      1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
-
-      // bottom
-      0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
-
-      // left side
-      -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0,
+    const colors = new Float32Array([
+      1.0, 1.0, 1.0, 1.0,    // Front face: white
+      1.0, 0.0, 0.0, 1.0,    // Back face: red
+      0.0, 1.0, 0.0, 1.0,    // Top face: green
+      0.0, 0.0, 1.0, 1.0,    // Bottom face: blue
+      1.0, 1.0, 0.0, 1.0,    // Right face: yellow
+      1.0, 0.0, 1.0, 1.0,    // Left face: purple
     ]);
-    const matrix = new Matrix4();
-    matrix.rotate(Math.PI, Vector3.right)!;
-    matrix.translate(new Vector3([-50, -75, -15]));
-
-    for (let ii = 0; ii < vertexes.length; ii += 3) {
-      const vector = matrix.multiplyVector4(
-        new Vector4([vertexes[ii + 0], vertexes[ii + 1], vertexes[ii + 2], 1])
-      );
-      vertexes[ii + 0] = vector.x;
-      vertexes[ii + 1] = vector.y;
-      vertexes[ii + 2] = vector.z;
-    }
-    return { vertexes, normals };
+    const indices = new Uint16Array([
+      0, 1, 2, 0, 2, 3,    // front
+      4, 5, 6, 4, 6, 7,    // back
+      8, 9, 10, 8, 10, 11,   // top
+      12, 13, 14, 12, 14, 15,   // bottom
+      16, 17, 18, 16, 18, 19,   // right
+      20, 21, 22, 20, 22, 23,   // left
+    ]);
+    return { vertexes, colors, indices };
   }
 }
