@@ -1,4 +1,3 @@
-
 import { BaseLight } from "./BaseLight";
 
 export class SpotLight extends BaseLight {

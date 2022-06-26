@@ -1,4 +1,3 @@
- 
 export enum EGLSLESDataType {
   FLOAT_Vector2 = 0x8b50,
   FLOAT_Vector3,

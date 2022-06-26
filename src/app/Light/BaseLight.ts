@@ -1,4 +1,3 @@
- 
 export class BaseLight {
   public color: number[];
   public shininess: number;

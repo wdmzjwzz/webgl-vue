@@ -32,7 +32,7 @@ export default class Sence extends Vue {
       [1, 1, 1, 1]
     );
     const plane = new PlaneEntity(20, 20);
-    
+
     plane.setTexture(
       new GLTexture({
         mag: DataType.NEAREST,
@@ -71,7 +71,7 @@ export default class Sence extends Vue {
       })
     );
     sphere.transform = m4.rotateX(sphere.transform, Math.PI / 3);
-    const translate = m4.translate(m4.identity(), v3.create(0,0.8, 0));
+    const translate = m4.translate(m4.identity(), v3.create(0, 0.8, 0));
     sphere.applyTransform(m4.multiply(translate, sphere.transform));
 
     const sence = new SenceApplication(canvas);
