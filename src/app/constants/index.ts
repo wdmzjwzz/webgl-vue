@@ -105,3 +105,32 @@ export enum DataType {
   DEPTH_COMPONENT = 0x1902,
   DEPTH_STENCIL = 0x84f9,
 }
+export const uniformSetters: {
+  [key: number]: (
+    gl: WebGL2RenderingContext,
+    uniformLocation: WebGLUniformLocation,
+    data: any
+  ) => void;
+} = {
+  [DataType.FLOAT_MAT4]: (
+    gl: WebGL2RenderingContext,
+    uniformLocation: WebGLUniformLocation,
+    data: any
+  ) => {
+    gl.uniformMatrix4fv(uniformLocation, false, data);
+  },
+  [DataType.FLOAT_VEC4]: (
+    gl: WebGL2RenderingContext,
+    uniformLocation: WebGLUniformLocation,
+    data: any
+  ) => {
+    gl.uniform4fv(uniformLocation, data);
+  },
+  [DataType.FLOAT_VEC3]: (
+    gl: WebGL2RenderingContext,
+    uniformLocation: WebGLUniformLocation,
+    data: any
+  ) => {
+    gl.uniform3fv(uniformLocation, data);
+  },
+};

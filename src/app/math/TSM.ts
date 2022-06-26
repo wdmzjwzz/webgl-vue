@@ -1,5 +1,5 @@
 /* eslint-disable */
-export const EPSILON: number = 0.0001; 
+export const EPSILON: number = 0.0001;
 export class Vector2 {
   public values = new Float32Array(2);
 
@@ -605,7 +605,7 @@ export class Matrix4 {
   }
 
   public inverse(): Matrix4 {
-    const out = this.copy();
+    const out = this;
     const a00 = out.values[0],
       a01 = out.values[1],
       a02 = out.values[2],

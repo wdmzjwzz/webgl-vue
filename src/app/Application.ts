@@ -220,7 +220,7 @@ export class Application implements EventListenerObject {
     this._lastTime = timeStamp;
 
     this._handleTimers(intervalSec);
-    // console.log (" elapsedTime = " + elapsedMsec + " diffTime = " + intervalSec);
+   
     // 先更新
     this.update(elapsedMsec, intervalSec);
     // 后渲染

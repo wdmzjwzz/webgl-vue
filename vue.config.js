@@ -13,8 +13,10 @@ module.exports = {
       .use("raw-loader")
       .loader("raw-loader")
       .end();
-  },
-  configureWebpack: {
-    devtool: "source-map",
+
+    config.when(
+      process.env.NODE_ENV === "development", // 开发环境
+      (config) => config.devtool("source-map") // 源码-慢
+    );
   },
 };

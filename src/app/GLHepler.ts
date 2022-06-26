@@ -1,3 +1,5 @@
+import { Matrix4, Vector3, Vector4 } from "./math/TSM";
+
 export enum EGLSLESDataType {
   FLOAT_Vector2 = 0x8b50,
   FLOAT_Vector3,
@@ -19,24 +21,6 @@ export enum EGLSLESDataType {
   INT = 0x1404,
 }
 
-export class GLAttribInfo {
-  public size: number; // size 是指type的个数，切记
-  public type: EGLSLESDataType; // type 是Uniform Type，而不是DataType
-  public location: WebGLUniformLocation | number;
-
-  public constructor(
-    size: number,
-    type: number,
-    loc: WebGLUniformLocation | number
-  ) {
-    this.size = size;
-    this.type = type;
-    this.location = loc;
-  }
-}
-
-export type GLAttribInfoMap = { [key: string]: GLAttribInfo };
-
 export class GLHelper {
   public static printStates(gl: WebGL2RenderingContext): void {
     // 所有的boolean状态变量，共9个
@@ -49,7 +33,7 @@ export class GLHelper {
     );
     console.log(
       "6. isSampleAlphtToCoverageEnable = " +
-        gl.isEnabled(gl.SAMPLE_ALPHA_TO_COVERAGE)
+      gl.isEnabled(gl.SAMPLE_ALPHA_TO_COVERAGE)
     );
     console.log(
       "7. isSampleCoverageEnable = " + gl.isEnabled(gl.SAMPLE_COVERAGE)
@@ -102,8 +86,10 @@ export class GLHelper {
   }
 
   public static setDefaultState(gl: WebGL2RenderingContext): void {
-    // default [r=0,g=0,b=0,a=0]
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    // default [r=0,g=0,b=0,a=0] 
+    const canvas = (gl.canvas as HTMLCanvasElement) 
+
+    gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
     gl.clearColor(0.0, 0.0, 0.0, 0.0); // 每次清屏时，将颜色缓冲区设置为全透明黑色
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     // turn on depth testing
@@ -111,60 +97,6 @@ export class GLHelper {
     // tell webgl to cull faces
     gl.enable(gl.CULL_FACE);
   }
-
-  public static compileShader(
-    gl: WebGL2RenderingContext,
-    code: string,
-    shader: WebGLShader
-  ): boolean {
-    gl.shaderSource(shader, code); // 载入shader源码
-    gl.compileShader(shader); // 编译shader源码
-    // 检查编译错误
-    if (gl.getShaderParameter(shader, gl.COMPILE_STATUS) === false) {
-      // 如果编译出现错误，则弹出对话框，了解错误的原因
-      console.error(gl.getShaderInfoLog(shader));
-      // 然后将shader删除掉，防止内存泄漏
-      gl.deleteShader(shader);
-      // 编译错误返回false
-      return false;
-    }
-    // 编译成功返回true
-    return true;
-  }
-  /* eslint-disable */
-  public static linkProgram(
-    gl: WebGL2RenderingContext, // 渲染上下文对象
-    program: WebGLProgram, // 链接器对象
-    vsShader: WebGLShader, // 要链接的顶点着色器
-    fsShader: WebGLShader, // 要链接的片段着色器
-    beforeProgramLink?: (
-      gl: WebGL2RenderingContext,
-      program: WebGLProgram
-    ) => void
-  ) {
-    // 1、使用attachShader方法将顶点和片段着色器与当前的连接器相关联
-    gl.attachShader(program, vsShader);
-    gl.attachShader(program, fsShader);
-
-    // 2、在调用linkProgram方法之前，按需触发beforeProgramLink回调函数
-    if (beforeProgramLink) {
-      beforeProgramLink(gl, program);
-    }
-
-    // 3、调用linkProgram进行链接操作
-    gl.linkProgram(program);
-
-    // 5、使用validateProgram进行链接验证
-    gl.validateProgram(program);
-    // 6、使用带gl.VALIDATE_STATUS参数的getProgramParameter方法，进行验证状态检查
-    if (
-      !gl.getProgramParameter(program, gl.VALIDATE_STATUS) ||
-      !gl.getProgramParameter(program, gl.LINK_STATUS)
-    ) {
-      throw new Error("linkProgram failed");
-    }
-  }
-
   public static getColorBufferData(gl: WebGL2RenderingContext): Uint8Array {
     const pixels: Uint8Array = new Uint8Array(
       gl.drawingBufferWidth * gl.drawingBufferHeight * 4
@@ -179,5 +111,119 @@ export class GLHelper {
       pixels
     );
     return pixels;
+  }
+
+  public static createFVertxes() {
+    const vertexes = new Float32Array([
+      // left column front
+      0, 0, 0, 0, 150, 0, 30, 0, 0, 0, 150, 0, 30, 150, 0, 30, 0, 0,
+
+      // top rung front
+      30, 0, 0, 30, 30, 0, 100, 0, 0, 30, 30, 0, 100, 30, 0, 100, 0, 0,
+
+      // middle rung front
+      30, 60, 0, 30, 90, 0, 67, 60, 0, 30, 90, 0, 67, 90, 0, 67, 60, 0,
+
+      // left column back
+      0, 0, 30, 30, 0, 30, 0, 150, 30, 0, 150, 30, 30, 0, 30, 30, 150, 30,
+
+      // top rung back
+      30, 0, 30, 100, 0, 30, 30, 30, 30, 30, 30, 30, 100, 0, 30, 100, 30, 30,
+
+      // middle rung back
+      30, 60, 30, 67, 60, 30, 30, 90, 30, 30, 90, 30, 67, 60, 30, 67, 90, 30,
+
+      // top
+      0, 0, 0, 100, 0, 0, 100, 0, 30, 0, 0, 0, 100, 0, 30, 0, 0, 30,
+
+      // top rung right
+      100, 0, 0, 100, 30, 0, 100, 30, 30, 100, 0, 0, 100, 30, 30, 100, 0, 30,
+
+      // under top rung
+      30, 30, 0, 30, 30, 30, 100, 30, 30, 30, 30, 0, 100, 30, 30, 100, 30, 0,
+
+      // between top rung and middle
+      30, 30, 0, 30, 60, 30, 30, 30, 30, 30, 30, 0, 30, 60, 0, 30, 60, 30,
+
+      // top of middle rung
+      30, 60, 0, 67, 60, 30, 30, 60, 30, 30, 60, 0, 67, 60, 0, 67, 60, 30,
+
+      // right of middle rung
+      67, 60, 0, 67, 90, 30, 67, 60, 30, 67, 60, 0, 67, 90, 0, 67, 90, 30,
+
+      // bottom of middle rung.
+      30, 90, 0, 30, 90, 30, 67, 90, 30, 30, 90, 0, 67, 90, 30, 67, 90, 0,
+
+      // right of bottom
+      30, 90, 0, 30, 150, 30, 30, 90, 30, 30, 90, 0, 30, 150, 0, 30, 150, 30,
+
+      // bottom
+      0, 150, 0, 0, 150, 30, 30, 150, 30, 0, 150, 0, 30, 150, 30, 30, 150, 0,
+
+      // left side
+      0, 0, 0, 0, 0, 30, 0, 150, 30, 0, 0, 0, 0, 150, 30, 0, 150, 0,
+    ]);
+    const normals = new Float32Array([
+      // left column front
+      0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+
+      // top rung front
+      0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+
+      // middle rung front
+      0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+
+      // left column back
+      0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,
+
+      // top rung back
+      0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,
+
+      // middle rung back
+      0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,
+
+      // top
+      0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
+
+      // top rung right
+      1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
+
+      // under top rung
+      0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
+
+      // between top rung and middle
+      1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
+
+      // top of middle rung
+      0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
+
+      // right of middle rung
+      1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
+
+      // bottom of middle rung.
+      0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
+
+      // right of bottom
+      1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
+
+      // bottom
+      0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
+
+      // left side
+      -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0,
+    ]);
+    const matrix = new Matrix4();
+    matrix.rotate(Math.PI, Vector3.right)!;
+    matrix.translate(new Vector3([-50, -75, -15]));
+
+    for (let ii = 0; ii < vertexes.length; ii += 3) {
+      const vector = matrix.multiplyVector4(
+        new Vector4([vertexes[ii + 0], vertexes[ii + 1], vertexes[ii + 2], 1])
+      );
+      vertexes[ii + 0] = vector.x;
+      vertexes[ii + 1] = vector.y;
+      vertexes[ii + 2] = vector.z;
+    }
+    return { vertexes, normals };
   }
 }
