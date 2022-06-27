@@ -19,13 +19,12 @@ export class Camera {
     height: number,
     fovY: number = 45.0,
     zNear: number = 0.1,
-    zFar: number = 1000
+    zFar: number = 100
   ) {
     const fov = MathHelper.toRadian(fovY);
-    const aspect = width / height;
-
+    const aspect = width / height; 
     this.projectionMat4 = Matrix4.perspective(fov, aspect, zNear, zFar);
-    this.position = new Vector3([0, 0, 20]);
+    this.position = new Vector3([0, 0, 50]);
     const target = new Vector3([0,0, 0]);
     const up = Vector3.up
     this.viewMat4 = Matrix4.lookAt(this.position, target, up);

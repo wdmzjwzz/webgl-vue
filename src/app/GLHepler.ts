@@ -116,49 +116,9 @@ export class GLHelper {
   public static createFVertxes() {
     const vertexes = new Float32Array([
       // Front face
-      -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0,
-
-      // Back face
-      -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0, -1.0,
-
-      // Top face
-      -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0,
-
-      // Bottom face
-      -1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, -1.0, -1.0, 1.0,
-
-      // Right face
-      1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0,
-
-      // Left face
-      -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0,
+      -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0,
     ]);
-    const colors = new Float32Array([
-      0.0,
-      0.0,
-      1.0,
-      1.0, // Front face: white
-      1.0,
-      0.0,
-      0.0,
-      1.0, // Back face: red
-      0.0,
-      1.0,
-      0.0,
-      1.0, // Top face: green
-      0.0,
-      0.0,
-      1.0,
-      1.0, // Bottom face: blue
-      1.0,
-      1.0,
-      0.0,
-      1.0, // Right face: yellow
-      1.0,
-      0.0,
-      1.0,
-      1.0, // Left face: purple
-    ]);
+
     const indices = new Uint16Array([
       0,
       1,
@@ -166,38 +126,8 @@ export class GLHelper {
       0,
       2,
       3, // front
-      4,
-      5,
-      6,
-      4,
-      6,
-      7, // back
-      8,
-      9,
-      10,
-      8,
-      10,
-      11, // top
-      12,
-      13,
-      14,
-      12,
-      14,
-      15, // bottom
-      16,
-      17,
-      18,
-      16,
-      18,
-      19, // right
-      20,
-      21,
-      22,
-      20,
-      22,
-      23, // left
     ]);
-    return { vertexes, colors, indices };
+    return { vertexes, indices };
   }
   public static createBuffers(
     gl: WebGL2RenderingContext,
@@ -256,7 +186,7 @@ export class GLHelper {
       }
       const attribInfo = atrributeInfoMap[key];
       const localtion = attribInfo.localtion as number;
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer); 
       gl.vertexAttribPointer(
         localtion,
         numComponents || 3,

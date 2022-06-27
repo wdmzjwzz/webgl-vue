@@ -55,53 +55,67 @@ export class CameraApplication extends Application {
     }
   }
   public start(): void {
-    const { vertexes, colors, indices } = GLHelper.createFVertxes();
+    this.resizeCanvasToDisplaySize()
+    // look up where the vertex data needs to go.
+    var positionAttributeLocation = this.gl.getAttribLocation(this.glProgram.program, "a_position");
 
-    const bufferData: {
-      [key: string]: BufferData;
-    } = {
-      a_position: {
-        data: vertexes,
-        numComponents: 3,
-      },
-      a_color: {
-        data: colors,
-        numComponents: 4,
-      },
-      indices: {
-        data: indices,
-      },
-    };
-    this.bufferInfo = GLHelper.createBuffers(this.gl, bufferData);
+    // Create a buffer and put three 2d clip space points in it
+    var positionBuffer = this.gl.createBuffer();
+
+    // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, positionBuffer);
+
+    var positions = [0, 0, 0, 0.5, 0.7, 0];
+    this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(positions), this.gl.STATIC_DRAW);
+
+    // Create a vertex array object (attribute state)
+    var vao = this.gl.createVertexArray();
+
+    // and make it the one we're currently working with
+    this.gl.bindVertexArray(vao);
+
+    // Turn on the attribute
+    this.gl.enableVertexAttribArray(positionAttributeLocation);
+
+    // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
+    var size = 2; // 2 components per iteration
+    var type = this.gl.FLOAT; // the data is 32bit floats
+    var normalize = false; // don't normalize the data
+    var stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
+    var offset = 0; // start at the beginning of the buffer
+    this.gl.vertexAttribPointer(
+      positionAttributeLocation,
+      size,
+      type,
+      normalize,
+      stride,
+      offset
+    );
+
+    
+
+    // Tell WebGL how to convert from clip space to pixels
+    this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
+
+    // Clear the canvas
+    this.gl.clearColor(0, 0, 0, 0);
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+
+    // Tell it to use our program (pair of shaders)
+    this.gl.useProgram(this.glProgram.program);
+
+    // Bind the attribute/buffer set we want.
+    this.gl.bindVertexArray(vao);
+
+    // draw
+    var primitiveType = this.gl.TRIANGLES;
+    var offset = 0;
+    var count = 3;
+    this.gl.drawArrays(primitiveType, offset, count);
     super.start();
   }
   public render(): void {
-    GLHelper.setDefaultState(this.gl);
-    this.matStack.pushMatrix();
-    this.matStack.modelViewMatrix.translate(new Vector3([0, 0, -6]));
-    const viewProjection = this.camera.viewProjection;
-    const u_matrix = Matrix4.product(
-      this.matStack.modelViewMatrix,
-      viewProjection
-    );
-    GLHelper.setAttributeInfo(
-      this.gl,
-      this.bufferInfo!,
-      this.glProgram.atrributeInfoMap
-    );
-    GLHelper.setUniformInfo(
-      this.gl,
-      {
-        u_matrix: u_matrix.values,
-      },
-      this.glProgram.uniformInfoMap
-    );
-    this.glProgram.bind();
-
-    const vertexCount = 4;
-    const type = this.gl.UNSIGNED_SHORT;
-    const offset = 0;
-    this.gl.drawElements(this.gl.TRIANGLES, vertexCount, type, offset);
+    
   }
   degToRad(d: number) {
     return (d * Math.PI) / 180;
