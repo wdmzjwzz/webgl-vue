@@ -14,7 +14,6 @@ export type BufferData = {
   data: Float32Array | Uint16Array;
   numComponents?: number;
   type?: number;
-  size?: number;
   normalize?: boolean;
   stride?: number;
   offset?: number;
@@ -24,7 +23,6 @@ export type BufferData = {
   buffer?: WebGLBuffer;
 };
 export type AttribInfo = {
-  data: Float32Array | Uint16Array;
   numComponents?: number;
   size?: number;
   type?: number;
@@ -33,14 +31,10 @@ export type AttribInfo = {
   stride?: number;
   buffer: WebGLBuffer;
   drawType?: number;
+  elementType?: number;
 };
 export type BufferInfo = {
-  numElements?: number;
-  elementType?: number;
-  indices?: WebGLBuffer;
-  attribs?: {
-    [key: string]: AttribInfo;
-  };
+  [key: string]: AttribInfo;
 };
 export default class GLProgram {
   public gl: WebGL2RenderingContext; // WebGL上下文渲染对象
@@ -62,39 +56,30 @@ export default class GLProgram {
   ) {
     this.gl = gl;
 
-    this.vsShader = this.createShader(this.gl.VERTEX_SHADER);
+    this.vsShader = this.createShader(this.gl.VERTEX_SHADER, vsShader);
 
-    this.fsShader = this.createShader(this.gl.FRAGMENT_SHADER);
+    this.fsShader = this.createShader(this.gl.FRAGMENT_SHADER, fsShader);
 
-    this.loadShaders(vsShader, fsShader);
-
+  
     this.program = this.createProgram();
 
     this.loadAttribInfo();
     this.loadUniformInfo();
   }
-  private createShader(type: GLenum) {
+  private createShader(type: GLenum, shaderSource: string) {
     const shader = this.gl.createShader(type);
     if (!shader) {
       throw new Error(`createShader Error:${type}`);
     }
+    this.gl.shaderSource(shader, shaderSource); // 载入shader源码
+    this.gl.compileShader(shader); // 编译shader源码
+    if (this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS) === false) {
+      console.error(this.gl.getShaderInfoLog(shader));
+      this.gl.deleteShader(shader);
+    }
     return shader;
   }
-  private compileShader(
-    gl: WebGL2RenderingContext,
-    code: string,
-    shader: WebGLShader
-  ): boolean {
-    gl.shaderSource(shader, code); // 载入shader源码
-    gl.compileShader(shader); // 编译shader源码
 
-    if (gl.getShaderParameter(shader, gl.COMPILE_STATUS) === false) {
-      console.error(gl.getShaderInfoLog(shader));
-      gl.deleteShader(shader);
-      return false;
-    }
-    return true;
-  }
   private createProgram() {
     const program = this.gl.createProgram();
     if (!program) {
@@ -121,10 +106,7 @@ export default class GLProgram {
       throw new Error("linkProgram failed");
     }
   }
-  private loadShaders(vs: string, fs: string): void {
-    this.compileShader(this.gl, vs, this.vsShader);
-    this.compileShader(this.gl, fs, this.fsShader);
-  }
+  
   private loadAttribInfo() {
     const numAttribs = this.gl.getProgramParameter(
       this.program,
@@ -136,8 +118,6 @@ export default class GLProgram {
         throw new Error("getActiveAttrib error");
       }
       const location = this.gl.getAttribLocation(this.program, attribInfo.name);
-      console.log(attribInfo.type, 6666);
-
       this.atrributeInfoMap[attribInfo.name] = {
         name: attribInfo.name,
         type: attribInfo.type,
@@ -180,70 +160,5 @@ export default class GLProgram {
 
   public unbind(): void {
     this.gl.useProgram(null);
-  }
-
-  public setBufferInfo(bufferData: { [key: string]: BufferData }) {
-    const keys = Object.keys(bufferData);
-    const attribs: any = {};
-    const bufferInfo: BufferInfo = {};
-    keys.forEach((key) => {
-      const { data, size, type, stride, offset, normalize } = bufferData[key];
-      if (key === "indices") {
-        const indexBuffer = this.gl.createBuffer();
-        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        this.gl.bufferData(
-          this.gl.ELEMENT_ARRAY_BUFFER,
-          data,
-          this.gl.STATIC_DRAW
-        );
-
-        bufferInfo.indices = {
-          buffer: indexBuffer,
-          numElements: (data as any).size,
-          elementType: this.gl.UNSIGNED_SHORT,
-        };
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
-        return;
-      }
-
-      const buffer = this.gl.createBuffer();
-      this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffer);
-      this.gl.bufferData(this.gl.ARRAY_BUFFER, data, this.gl.STATIC_DRAW);
-
-      attribs[key] = {
-        buffer: buffer,
-        numComponents: size,
-        type: type || this.gl.FLOAT,
-        normalize: normalize || false,
-        stride: stride || 0,
-        offset: offset || 0,
-        drawType: this.gl.STATIC_DRAW,
-      };
-    });
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
-    bufferInfo.attribs = attribs;
-    this.bufferInfo = bufferInfo;
-  }
-  public setUniformInfo(uniformData: { [key: string]: any }) {
-    const keys = Object.keys(this.uniformInfoMap);
-    keys.forEach((key) => {
-      const data = uniformData[key];
-      const uniform = this.uniformInfoMap[key];
-      const setter = uniformSetters[uniform.type];
-      if (setter) {
-        setter(this.gl, uniform.localtion, data);
-      }
-    });
-  }
-  public setAttributeInfo() {
-    const keys = Object.keys(this.atrributeInfoMap);
-    keys.forEach((key) => {
-      const attribInfo = this.bufferInfo!.attribs![key];
-      const attrib = this.atrributeInfoMap[key];
-      const setter = attribSetters[attrib.type];
-      if (setter) {
-        setter(this.gl, attrib.localtion as number, attribInfo);
-      }
-    });
   }
 }

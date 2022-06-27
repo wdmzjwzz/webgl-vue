@@ -8,7 +8,7 @@ import colorFS from "@/shaders/shodowColor.frag";
 import { BaseLight } from "./Light/BaseLight";
 import { GLWorldMatrixStack } from "./GLMatrixStack";
 import * as twgl from "twgl.js";
-import GLProgram, { BufferData } from "./GLProgram";
+import GLProgram, { BufferData, BufferInfo } from "./GLProgram";
 import { GLHelper } from "./GLHepler";
 import { Matrix4, Vector3 } from "./math/TSM";
 export class CameraApplication extends Application {
@@ -18,7 +18,7 @@ export class CameraApplication extends Application {
 
   public light: BaseLight | null = null;
 
-  public bufferInfo: twgl.BufferInfo | null = null;
+  public bufferInfo: BufferInfo | null = null;
   public uniformsData: { [key: string]: any } = {};
 
   public matStack: GLWorldMatrixStack;
@@ -56,66 +56,42 @@ export class CameraApplication extends Application {
   }
   public start(): void {
     const { vertexes, colors, indices } = GLHelper.createFVertxes();
+   
     const bufferData: {
       [key: string]: BufferData;
     } = {
       a_position: {
         data: vertexes,
-        size: 3,
-        type: this.gl.FLOAT,
-        stride: 0,
-        offset: 0,
-        normalize: false,
+        numComponents: 3,
       },
       a_color: {
         data: colors,
-        size: 3,
-        type: this.gl.FLOAT,
-        stride: 0,
-        offset: 0,
-        normalize: false,
+        numComponents: 4,
       },
       indices: {
         data: indices,
       },
     };
     // and make it the one we're currently working with
+    this.bufferInfo = GLHelper.createBuffers(this.gl, bufferData);
+   
 
-    this.glProgram.setBufferInfo(bufferData);
-    this.glProgram.bind();
     super.start();
   }
   public render(): void {
-    this.resizeCanvasToDisplaySize();
     GLHelper.setDefaultState(this.gl);
-    // Compute the matrix
-    // this.angle += 0.1
 
-    const viewProjectionMatrix = this.camera.projectionMat4;
-
-    // Draw a F at the origin with rotation
-    this.matStack.pushMatrix();
-    // this.matStack.rotate(this.angle, Vector3.up)
-
-    const worldMatrix = this.matStack.modelViewMatrix;
-    const worldViewProjectionMatrix = Matrix4.product(
-      viewProjectionMatrix,
-      worldMatrix
-    );
-  
-    const uniformInfo = {
-      uModelViewMatrix: worldMatrix.values,
-      uProjectionMatrix: worldViewProjectionMatrix.values,
-    };
-    this.glProgram.setUniformInfo(uniformInfo);
-    this.glProgram.setAttributeInfo();
-    // Draw the geometry.
-
-    const vertexCount = 36;
+    GLHelper.setAttributeInfo(
+      this.gl,
+      this.bufferInfo!,
+      this.glProgram.atrributeInfoMap
+    ); 
+    this.glProgram.bind();
+   
+    const vertexCount = 4;
     const type = this.gl.UNSIGNED_SHORT;
     const offset = 0;
     this.gl.drawElements(this.gl.TRIANGLES, vertexCount, type, offset);
-    this.matStack.popMatrix();
   }
   degToRad(d: number) {
     return (d * Math.PI) / 180;

@@ -25,11 +25,11 @@ export class Camera {
     const aspect = width / height;
 
     this.projectionMat4 = Matrix4.perspective(fov, aspect, zNear, zFar);
-    this.position = new Vector3([0, 0, 200]);
+    this.position = new Vector3([0, 0, 500]);
     const target = new Vector3([0,0, 0]);
     const up = Vector3.up
     this.viewMat4 = Matrix4.lookAt(this.position, target, up);
-    this.viewInverseMat4 = this.viewMat4.copy().inverse();
+    this.viewInverseMat4 = this.viewMat4.inverse();
     this.viewProjection = Matrix4.product(this.projectionMat4, this.viewInverseMat4);
   }
   /**
