@@ -88,16 +88,14 @@ export class GLHelper {
   }
 
   public static setDefaultState(gl: WebGL2RenderingContext): void {
-    // default [r=0,g=0,b=0,a=0]
     const canvas = gl.canvas as HTMLCanvasElement;
-
     gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
-    gl.clearColor(0.0, 0.0, 0.0, 0.0); // 每次清屏时，将颜色缓冲区设置为全透明黑色
+    gl.clearColor(0.0, 0.0, 0.0, 1.0); // 每次清屏时，将颜色缓冲区设置为全透明黑色
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     // turn on depth testing
     gl.enable(gl.DEPTH_TEST);
     // tell webgl to cull faces
-    // gl.enable(gl.CULL_FACE);
+    gl.enable(gl.CULL_FACE);
   }
   public static getColorBufferData(gl: WebGL2RenderingContext): Uint8Array {
     const pixels: Uint8Array = new Uint8Array(
@@ -118,48 +116,48 @@ export class GLHelper {
   public static createFVertxes() {
     const vertexes = new Float32Array([
       // Front face
-      0, 0, 0.5, 0.5, 0, 0.5, 0.5, 0.5, 0.5, 0, 0.5, 0.5,
+      -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0,
 
-      // // Back face
-      // -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5, -0.5,
+      // Back face
+      -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0, -1.0,
 
-      // // Top face
-      // -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, -0.5,
+      // Top face
+      -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0,
 
-      // // Bottom face
-      // -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, 0.5, -0.5, 0.5, -0.5, -0.5, 0.5,
+      // Bottom face
+      -1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, -1.0, -1.0, 1.0,
 
-      // // Right face
-      // 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5, 0.5, 0.5, 0.5, -0.5, 0.5,
+      // Right face
+      1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0, 1.0,
 
-      // // Left face
-      // -0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, 0.5, -0.5,
+      // Left face
+      -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0,
     ]);
     const colors = new Float32Array([
       0.0,
       0.0,
       1.0,
       1.0, // Front face: white
-      // 1.0,
-      // 0.0,
-      // 0.0,
-      // 1.0, // Back face: red
-      // 0.0,
-      // 1.0,
-      // 0.0,
-      // 1.0, // Top face: green
-      // 0.0,
-      // 0.0,
-      // 1.0,
-      // 1.0, // Bottom face: blue
-      // 1.0,
-      // 1.0,
-      // 0.0,
-      // 1.0, // Right face: yellow
-      // 1.0,
-      // 0.0,
-      // 1.0,
-      // 1.0, // Left face: purple
+      1.0,
+      0.0,
+      0.0,
+      1.0, // Back face: red
+      0.0,
+      1.0,
+      0.0,
+      1.0, // Top face: green
+      0.0,
+      0.0,
+      1.0,
+      1.0, // Bottom face: blue
+      1.0,
+      1.0,
+      0.0,
+      1.0, // Right face: yellow
+      1.0,
+      0.0,
+      1.0,
+      1.0, // Left face: purple
     ]);
     const indices = new Uint16Array([
       0,
@@ -168,36 +166,36 @@ export class GLHelper {
       0,
       2,
       3, // front
-      // 4,
-      // 5,
-      // 6,
-      // 4,
-      // 6,
-      // 7, // back
-      // 8,
-      // 9,
-      // 10,
-      // 8,
-      // 10,
-      // 11, // top
-      // 12,
-      // 13,
-      // 14,
-      // 12,
-      // 14,
-      // 15, // bottom
-      // 16,
-      // 17,
-      // 18,
-      // 16,
-      // 18,
-      // 19, // right
-      // 20,
-      // 21,
-      // 22,
-      // 20,
-      // 22,
-      // 23, // left
+      4,
+      5,
+      6,
+      4,
+      6,
+      7, // back
+      8,
+      9,
+      10,
+      8,
+      10,
+      11, // top
+      12,
+      13,
+      14,
+      12,
+      14,
+      15, // bottom
+      16,
+      17,
+      18,
+      16,
+      18,
+      19, // right
+      20,
+      21,
+      22,
+      20,
+      22,
+      23, // left
     ]);
     return { vertexes, colors, indices };
   }

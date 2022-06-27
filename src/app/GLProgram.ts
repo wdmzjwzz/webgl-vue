@@ -60,7 +60,6 @@ export default class GLProgram {
 
     this.fsShader = this.createShader(this.gl.FRAGMENT_SHADER, fsShader);
 
-  
     this.program = this.createProgram();
 
     this.loadAttribInfo();
@@ -85,28 +84,20 @@ export default class GLProgram {
     if (!program) {
       throw new Error(`createProgram Error `);
     }
-    this.linkProgram(this.gl, program, this.vsShader, this.fsShader);
-    return program;
-  }
-  private linkProgram(
-    gl: WebGL2RenderingContext,
-    program: WebGLProgram,
-    vsShader: WebGLShader,
-    fsShader: WebGLShader
-  ) {
-    gl.attachShader(program, vsShader);
-    gl.attachShader(program, fsShader);
-    gl.linkProgram(program);
+    this.gl.attachShader(program, this.vsShader);
+    this.gl.attachShader(program, this.fsShader);
+    this.gl.linkProgram(program);
 
-    gl.validateProgram(program);
+    this.gl.validateProgram(program);
     if (
-      !gl.getProgramParameter(program, gl.VALIDATE_STATUS) ||
-      !gl.getProgramParameter(program, gl.LINK_STATUS)
+      !this.gl.getProgramParameter(program, this.gl.VALIDATE_STATUS) ||
+      !this.gl.getProgramParameter(program, this.gl.LINK_STATUS)
     ) {
       throw new Error("linkProgram failed");
     }
+    return program;
   }
-  
+
   private loadAttribInfo() {
     const numAttribs = this.gl.getProgramParameter(
       this.program,

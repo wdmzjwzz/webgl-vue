@@ -56,7 +56,7 @@ export class CameraApplication extends Application {
   }
   public start(): void {
     const { vertexes, colors, indices } = GLHelper.createFVertxes();
-   
+
     const bufferData: {
       [key: string]: BufferData;
     } = {
@@ -72,22 +72,32 @@ export class CameraApplication extends Application {
         data: indices,
       },
     };
-    // and make it the one we're currently working with
     this.bufferInfo = GLHelper.createBuffers(this.gl, bufferData);
-   
-
     super.start();
   }
   public render(): void {
     GLHelper.setDefaultState(this.gl);
-
+    this.matStack.pushMatrix();
+    this.matStack.modelViewMatrix.translate(new Vector3([0, 0, -6]));
+    const viewProjection = this.camera.viewProjection;
+    const u_matrix = Matrix4.product(
+      this.matStack.modelViewMatrix,
+      viewProjection
+    );
     GLHelper.setAttributeInfo(
       this.gl,
       this.bufferInfo!,
       this.glProgram.atrributeInfoMap
-    ); 
+    );
+    GLHelper.setUniformInfo(
+      this.gl,
+      {
+        u_matrix: u_matrix.values,
+      },
+      this.glProgram.uniformInfoMap
+    );
     this.glProgram.bind();
-   
+
     const vertexCount = 4;
     const type = this.gl.UNSIGNED_SHORT;
     const offset = 0;

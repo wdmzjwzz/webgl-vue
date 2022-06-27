@@ -19,7 +19,7 @@ export default class Sence extends Vue {
     if (!this.$refs) {
       return;
     }  
-    const camera = new Camera(canvas.clientWidth, canvas.clientHeight, 45, 0.1, 1000);
+    const camera = new Camera(canvas.clientWidth, canvas.clientHeight, 45, 0.1, 100);
     const sence = new CameraApplication(canvas, camera); 
     sence.start(); 
   } 
