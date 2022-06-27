@@ -2,13 +2,12 @@
 import { Application, CanvasKeyBoardEvent } from "./Application";
 import { Camera } from "./Camera";
 
-
 import colorVS from "@/shaders/shodowColor.vert";
 import colorFS from "@/shaders/shodowColor.frag";
 
 import { BaseLight } from "./Light/BaseLight";
 import { GLWorldMatrixStack } from "./GLMatrixStack";
-import * as twgl from 'twgl.js'
+import * as twgl from "twgl.js";
 import GLProgram, { BufferData } from "./GLProgram";
 import { GLHelper } from "./GLHepler";
 import { Matrix4, Vector3 } from "./math/TSM";
@@ -24,9 +23,9 @@ export class CameraApplication extends Application {
 
   public matStack: GLWorldMatrixStack;
 
-  public glProgram: GLProgram
+  public glProgram: GLProgram;
 
-  public vao: WebGLVertexArrayObject
+  public vao: WebGLVertexArrayObject;
   public constructor(canvas: HTMLCanvasElement, camera: Camera) {
     super(canvas);
     const gl = this.canvas.getContext("webgl2");
@@ -37,19 +36,16 @@ export class CameraApplication extends Application {
     if (!vao) {
       throw new Error("createVertexArray failed");
     }
-    this.vao = vao
+    this.vao = vao;
     this.gl = gl;
     this.camera = camera;
     this.matStack = new GLWorldMatrixStack();
-    this.glProgram = new GLProgram(gl, colorVS, colorFS)
-
+    this.glProgram = new GLProgram(gl, colorVS, colorFS);
   }
   public addLight(light: BaseLight) {
     this.light = light;
   }
-  public update(elapsedMsec: number, intervalSec: number): void {
-
-  }
+  public update(elapsedMsec: number, intervalSec: number): void {}
 
   resizeCanvasToDisplaySize() {
     const canvas = this.gl.canvas as HTMLCanvasElement;
@@ -57,11 +53,11 @@ export class CameraApplication extends Application {
       canvas.width = canvas.clientWidth;
       canvas.height = canvas.clientHeight;
     }
-  };
+  }
   public start(): void {
-    const { vertexes, colors ,indices} = GLHelper.createFVertxes()
+    const { vertexes, colors, indices } = GLHelper.createFVertxes();
     const bufferData: {
-      [key: string]: BufferData
+      [key: string]: BufferData;
     } = {
       a_position: {
         data: vertexes,
@@ -69,7 +65,7 @@ export class CameraApplication extends Application {
         type: this.gl.FLOAT,
         stride: 0,
         offset: 0,
-        normalize: false
+        normalize: false,
       },
       a_color: {
         data: colors,
@@ -77,59 +73,52 @@ export class CameraApplication extends Application {
         type: this.gl.FLOAT,
         stride: 0,
         offset: 0,
-        normalize: false
+        normalize: false,
       },
       indices: {
         data: indices,
-        size: 3,
-        type: this.gl.FLOAT,
-        stride: 0,
-        offset: 0,
-        normalize: false
-      }
-    }
+      },
+    };
     // and make it the one we're currently working with
 
-    this.glProgram.setBufferInfo(bufferData)
-    this.glProgram.bind()
+    this.glProgram.setBufferInfo(bufferData);
+    this.glProgram.bind();
     super.start();
   }
   public render(): void {
-    this.resizeCanvasToDisplaySize()
+    this.resizeCanvasToDisplaySize();
     GLHelper.setDefaultState(this.gl);
     // Compute the matrix
-    // this.angle += 0.1 
+    // this.angle += 0.1
 
-    const viewProjectionMatrix = this.camera.viewProjection
+    const viewProjectionMatrix = this.camera.projectionMat4;
 
     // Draw a F at the origin with rotation
-    this.matStack.pushMatrix()
+    this.matStack.pushMatrix();
     // this.matStack.rotate(this.angle, Vector3.up)
 
     const worldMatrix = this.matStack.modelViewMatrix;
-    const worldViewProjectionMatrix = Matrix4.product(viewProjectionMatrix, worldMatrix);
-    const newWorldMat4 = worldMatrix.copy()
-    newWorldMat4.inverse();
-    newWorldMat4.transpose();
-
+    const worldViewProjectionMatrix = Matrix4.product(
+      viewProjectionMatrix,
+      worldMatrix
+    );
+  
     const uniformInfo = {
-      u_worldViewProjection: worldViewProjectionMatrix.values,
-      u_worldInverseTranspose: newWorldMat4.values,
-      u_color: [0.2, 1, 0.2, 1],
-      // u_reverseLightDirection: new Vector3([0.2, 1, 0.2, 1]).normalize().values
-    }
-    this.glProgram.setUniformInfo(uniformInfo)
+      uModelViewMatrix: worldMatrix.values,
+      uProjectionMatrix: worldViewProjectionMatrix.values,
+    };
+    this.glProgram.setUniformInfo(uniformInfo);
+    this.glProgram.setAttributeInfo();
     // Draw the geometry.
-    const primitiveType = this.gl.TRIANGLES;
+
+    const vertexCount = 36;
+    const type = this.gl.UNSIGNED_SHORT;
     const offset = 0;
-    const count = 6 * 6;
-    this.gl.drawArrays(primitiveType, offset, count);
-    this.matStack.popMatrix()
+    this.gl.drawElements(this.gl.TRIANGLES, vertexCount, type, offset);
+    this.matStack.popMatrix();
   }
   degToRad(d: number) {
-    return d * Math.PI / 180;
+    return (d * Math.PI) / 180;
   }
-  public onKeyPress(evt: CanvasKeyBoardEvent): void {
-
-  }
+  public onKeyPress(evt: CanvasKeyBoardEvent): void {}
 }

@@ -1,3 +1,5 @@
+import { BufferData } from "../GLProgram";
+
 export enum EntityType {
   Plane = "Plane",
   Cube = "Cube",
@@ -116,7 +118,7 @@ export const uniformSetters: {
     gl: WebGL2RenderingContext,
     uniformLocation: WebGLUniformLocation,
     data: any
-  ) => {
+  ) => { 
     gl.uniformMatrix4fv(uniformLocation, false, data);
   },
   [DataType.FLOAT_VEC4]: (
@@ -132,5 +134,31 @@ export const uniformSetters: {
     data: any
   ) => {
     gl.uniform3fv(uniformLocation, data);
+  },
+};
+export const attribSetters: {
+  [key: number]: (
+    gl: WebGL2RenderingContext,
+    location: number,
+    bufferData: BufferData
+  ) => void;
+} = {
+  [DataType.FLOAT_VEC4]: (
+    gl: WebGL2RenderingContext,
+    location: number,
+    bufferData: BufferData
+  ) => {
+    console.log(location,bufferData);
+    
+    gl.bindBuffer(DataType.ARRAY_BUFFER, bufferData.buffer!);
+    gl.enableVertexAttribArray(location);
+    gl.vertexAttribPointer(
+      location,
+      bufferData.numComponents || 3,
+      bufferData.type || gl.FLOAT,
+      bufferData.normalize || false,
+      bufferData.stride || 0,
+      bufferData.offset || 0
+    );
   },
 };
